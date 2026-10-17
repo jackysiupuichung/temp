@@ -1,377 +1,217 @@
-# Organisation structure of the Library Journal Club society
+# The Library Journal Club as a research group
 
-Diagrams for recommendations §4 of [organisation_structure.md](organisation_structure.md) and §1-2 of [synthesis.md](synthesis.md). First the whole organisation, then each step as an interaction, then three full cycles showing what changes between rounds. Each element names the paper it comes from.
+![Organisation schematic](journal_club_schematic.svg)
 
-## 🏛️ The whole organisation
+*Schematic source: [journal_club_schematic.svg](journal_club_schematic.svg). The Mermaid diagrams below give the same design as text.*
+
+A hierarchical design modelled on how a real journal club runs: a convener chairs, topic groups meet first, group leads report to the plenary, the convener decides and the scribe writes the minutes. The hierarchy is Virtual Lab's (PI + standing Critic + scientist agents); the review rubric and the archive are ASCollab's; the dispute step is ours.
+
+## 🏛️ The hierarchy
 
 ```mermaid
 flowchart TB
-    accTitle: Library Journal Club organisation structure
-    accDescr: Twenty paper agents sit on a flat network. Two shared stores, a registry and an archive, mediate who finds whom. Three privileged roles that do no research: reviewers drawn from the agents, a judge on a different model, and a meta-reviewer. The human sets the agenda and triages unresolved disputes. Everything is written to one event log that feeds Zotero, the network view and the minutes.
+    accTitle: Journal club hierarchy
+    accDescr: The scientist sets the agenda. A convener agent chairs the club with a standing critic and a scribe. Papers are clustered into three topic groups, each with a group lead. Within a group, one paper presents and two discuss. The scribe writes everything to the event log, Zotero and the minutes.
 
-    human["🧑‍🔬 Scientist<br/>agenda at start, morning triage<br/>(Virtual Lab: ~1% of words)"]
+    scientist["🧑‍🔬 Scientist<br/>sets the agenda, reads the minutes,<br/>settles what the convener could not"]
 
-    subgraph society["Flat society of paper agents (ASCollab: every agent is a PI)"]
+    subgraph chair["Chair (Virtual Lab PI + Critic)"]
         direction LR
-        paper_a["📄 Paper A"]
-        paper_b["📄 Paper B"]
-        paper_c["📄 Paper C"]
-        paper_n["📄 ... Paper T<br/>(20 total)"]
-        paper_a <-. "sparse random edges<br/>~3 per agent (MacNet)" .-> paper_b
-        paper_b <-.-> paper_c
-        paper_a <-. "1 long-range edge between<br/>most divergent claims (small-world)" .-> paper_n
+        convener["🪑 Convener<br/>opens, synthesises, decides,<br/>sets next agenda"]
+        critic["🔍 Critic<br/>standing; checks rigour and<br/>that quotes exist in the source"]
+        scribe["✍️ Scribe<br/>structured minutes,<br/>events.jsonl, Zotero notes"]
     end
 
-    subgraph stores["Shared stores (ASCollab §3.1)"]
-        registry[("🗂️ Registry<br/>expertise embedding<br/>#accepted, #citations")]
-        archive[("📚 Archive<br/>never discard (DGM)<br/>notes + scores + verdicts")]
+    subgraph groups["Topic groups (papers clustered by similarity, ~6-7 each)"]
+        direction LR
+        subgraph g1["Group 1"]
+            lead1["👤 Group lead<br/>most central paper"]
+            pres1["📄 Presenter"]
+            disc1["📄 Discussants x2"]
+            mem1["📄 Members"]
+        end
+        subgraph g2["Group 2"]
+            lead2["👤 Group lead"]
+            pres2["📄 Presenter"]
+            disc2["📄 Discussants x2"]
+            mem2["📄 Members"]
+        end
+        subgraph g3["Group 3"]
+            lead3["👤 Group lead"]
+            pres3["📄 Presenter"]
+            disc3["📄 Discussants x2"]
+            mem3["📄 Members"]
+        end
     end
 
-    subgraph privileged["Roles that do no research"]
-        reviewers["🔍 Reviewers<br/>2 near + 1 far, blind<br/>(AgentReview, ResearchTown)"]
-        judge["⚖️ Judge<br/>different model from debaters<br/>(Liang MAD)"]
-        meta["📝 Meta-reviewer<br/>tournament of 4, digest<br/>(ASCollab, Co-Scientist)"]
-    end
+    archive[("📚 Archive<br/>events.jsonl, Zotero")]
 
-    events[["🧾 events.jsonl<br/>append-only"]]
+    scientist -- agenda --> convener
+    convener -- "agenda questions" --> lead1
+    convener -- "agenda questions" --> lead2
+    convener -- "agenda questions" --> lead3
+    lead1 -- "group summary" --> convener
+    lead2 -- "group summary" --> convener
+    lead3 -- "group summary" --> convener
+    critic -. "sits in every meeting" .-> convener
+    convener -- "decisions, verdicts" --> scribe
+    scribe --> archive
+    archive -- minutes --> scientist
 
-    subgraph outputs["What the scientist sees"]
-        zotero["📓 Zotero notes"]
-        network["🕸️ Network view<br/>green = collab, red = dispute"]
-        minutes["📰 Minutes"]
-    end
-
-    human -- "agenda, claims" --> society
-    society -- "find collaborator / reviewer<br/>0.8 sim + 0.2 citations" --> registry
-    society -- "retrieve top-k prior findings" --> archive
-    society -- "notes, not transcripts" --> reviewers
-    reviewers -- "scores 1-4 x4, rec 1-5" --> meta
-    society -- "clashing claims" --> judge
-    judge -- "stands / contested / unresolved" --> events
-    meta -- "accept top 25-50%" --> archive
-    meta -- "why things lost" --> society
-    archive -- "citations update reputation" --> registry
-    reviewers --> events
-    meta --> events
-    society --> events
-    events --> zotero
-    events --> network
-    events --> minutes
-    events -- "unresolved only" --> human
-
-    classDef agent fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
-    classDef store fill:#fef9c3,stroke:#ca8a04,stroke-width:2px,color:#713f12
-    classDef role fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843
-    classDef log fill:#e5e7eb,stroke:#4b5563,stroke-width:2px,color:#1f2937
-    classDef out fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
     classDef person fill:#ffedd5,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    classDef chairrole fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843
+    classDef leadrole fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
+    classDef paper fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
+    classDef store fill:#fef9c3,stroke:#ca8a04,stroke-width:2px,color:#713f12
 
-    class paper_a,paper_b,paper_c,paper_n agent
-    class registry,archive store
-    class reviewers,judge,meta role
-    class events log
-    class zotero,network,minutes out
-    class human person
+    class scientist person
+    class convener,critic,scribe chairrole
+    class lead1,lead2,lead3 leadrole
+    class pres1,disc1,mem1,pres2,disc2,mem2,pres3,disc3,mem3 paper
+    class archive store
 ```
 
-Structural decisions, with their source:
+### Roles
 
-| Decision | Choice | Why | Source |
+| Role | Who | Does | Source |
 | --- | --- | --- | --- |
-| Hierarchy | Flat; no PI agent | Papers are peers; a PI would average dissent away | ASCollab §3 |
-| Who may talk to whom | Sparse random edges, ~3 per agent, plus one long-range edge | Random DAGs beat mesh at half the time; ~16 nodes is the useful range | MacNet, small-world |
-| What travels on an edge | Structured notes only, never transcripts | Linear context growth; models attend to latest turns anyway | MacNet, ChatDev, Virtual Lab, Du et al. |
-| Reviewers | Drawn from the agents, 2 near + 1 far, blind | Author identity shifts decisions 27.7% | AgentReview, ResearchTown |
-| Judge | Separate role on a different model | Judge favours its own backbone | Liang MAD |
-| Meta-reviewer | Tool-less, sees 4 related notes + archive samples | Calibration against the archive | ASCollab §3.4 |
-| Human | Agenda at start, triage of `unresolved` in the morning | Cheap and high-leverage at checkpoints | Virtual Lab, AutoGen, Agent Laboratory |
+| Scientist | Human | Writes the agenda question once; reads the minutes; settles `unresolved` | Virtual Lab (1.3% of words) |
+| Convener | One agent, strongest model | Chairs; synthesises each round; must "choose one"; sets next agenda | Virtual Lab PI |
+| Critic | One agent, standing | Last to speak in every meeting; checks rigour and that every quote exists in the source; feedback only | Virtual Lab Critic |
+| Scribe | One agent, cheap model | Writes the structured summary and the Zotero notes; never argues | Virtual Lab summary format |
+| Group lead | The most central paper in each cluster | Picks presenter and discussants; moderates; writes the group summary; reports to plenary | New; ResearchTown clustering |
+| Presenter | One paper per group per session | States its claim, evidence, limits | Paper agent |
+| Discussants | The 2 papers nearest the presenter | Critique on the ASCollab rubric (Support, Soundness, Significance, Originality 1-4) | ASCollab K=2 |
+| Members | The rest of the group | May say "pass" or disagree | Virtual Lab team prompt |
+
+Every agent is four fields: title, expertise, goal, role (Virtual Lab). Group leads and discussants are ordinary papers given a second system prompt for the session.
 
 ---
 
-## 🔁 One round, step by step
+## 📅 One session
 
-Each step is one interaction pattern. Actors are the same as in the organisation diagram.
-
-### Step 1: Paper agents wake up
+A session has three meetings, like a real journal club: group meetings in parallel, then the plenary, then the chair's summary.
 
 ```mermaid
 sequenceDiagram
-    accTitle: Step 1 paper agent creation and warm-up
-    accDescr: Person 1 produces a paper card per Zotero item. Each agent is built from four fields plus a six-stance persona. Before acting, every agent reads its own digest and the archive.
+    accTitle: One journal club session
+    accDescr: The convener sends agenda questions to the group leads. Each group runs a presentation, discussion by two discussants, a critic check and a lead summary, in parallel. In the plenary the leads report, the convener opens disputes where groups conflict and proposes cross-group collaborations, and decides. The scribe writes the minutes and Zotero notes.
 
-    participant Z as Zotero
-    participant P1 as Person 1 ingestion
-    participant A as Paper agent
-    participant AR as Archive
-    participant M as Meta-reviewer
+    participant S as Scientist
+    participant C as Convener
+    participant L as Group lead
+    participant P as Presenter
+    participant D as Discussants x2
+    participant K as Critic
+    participant W as Scribe
 
-    Z->>P1: metadata + PDF
-    P1->>A: paper_card (claims, methods, data, limits, tools)
-    Note over A: title, expertise, goal, role (Virtual Lab)<br/>+ 6 fixed stances (ASCollab B.2)
-    M-->>A: digest: why things lost last round, own lowest score
-    A->>AR: top-k similar findings (0.2 citation boost)
-    AR-->>A: prior notes
-```
+    S->>C: agenda question (session 1 only)
+    C->>L: agenda questions, prior summaries
 
-Round 1 has no digest and an empty archive; the dashed arrows are skipped.
-
-### Step 2: Peer review
-
-```mermaid
-sequenceDiagram
-    accTitle: Step 2 blind peer review with reviewer matching
-    accDescr: For each paper note, the registry returns two near reviewers by embedding similarity and one far reviewer from another cluster. Reviewers score on a fixed rubric without seeing authorship. Scores go to the event log and the meta-reviewer.
-
-    participant A as Paper A (author)
-    participant R as Registry
-    participant N1 as Near reviewer 1
-    participant N2 as Near reviewer 2
-    participant F as Far reviewer
-    participant E as events.jsonl
-
-    A->>R: note embedding
-    R-->>A: top-2 similar (ResearchTown), 1 random other cluster (MacNet)
-    par blind, in parallel
-        A->>N1: note with authorship stripped
-        A->>N2: note with authorship stripped
-        A->>F: note with authorship stripped
+    rect rgb(235, 240, 255)
+        Note over L,K: Meeting 1: group meeting (3 groups in parallel)
+        L->>P: present
+        P->>D: claim, evidence, limits
+        D->>L: critique, scores 1-4 x4
+        K->>L: rigour check, quotes verified?
+        L->>C: group summary (Agenda / Input / Recommendation / Next)
     end
-    N1-->>E: Support/Soundness/Significance/Originality 1-4, rec 1-5
-    N2-->>E: same rubric
-    F-->>E: same rubric
-    Note over N1,F: cap 3 reviews per agent per round<br/>reject reviews under a length floor (AgentReview)
-```
 
-### Step 3: Dispute
-
-```mermaid
-sequenceDiagram
-    accTitle: Step 3 dispute with a neutral judge
-    accDescr: A dispute opens when structured claims clash or two reviewers differ by two or more. The owner and challenger argue for at most three turns with moderate intensity. A judge on a different model rules after each turn and extracts a verdict at the cap.
-
-    participant E as events.jsonl
-    participant O as Paper A (owner)
-    participant C as Paper B (challenger)
-    participant J as Judge (other model)
-    participant H as Scientist
-
-    E->>J: trigger: claims clash, or reviewer recs differ by >= 2
-    loop up to 3 turns (Liang MAD, Du saturation)
-        O->>J: defend with quotes + locations
-        C->>J: counter with quotes + locations
-        J->>J: discriminative check: resolved yet?
+    rect rgb(255, 240, 235)
+        Note over C,K: Meeting 2: plenary (leads + convener + critic)
+        L->>C: each lead reports
+        C->>C: do two groups' claims conflict?
+        alt conflict
+            C->>L: dispute: owner vs challenger, 2 turns
+            K->>C: which side's evidence holds?
+            C-->>W: stands / contested / unresolved
+        end
+        C->>L: cross-group collaboration: one pair
+        L-->>W: proposal
     end
-    alt judge sides with owner
-        J-->>E: stands
-    else judge sides with challenger
-        J-->>E: contested (both claims kept, linked)
-    else cap hit, no verdict
-        J-->>E: unresolved
-        E-->>H: morning triage
-    end
-    Note over O,C: no permanent devil's advocate (Smit)<br/>"no conflict" is a legal outcome
-```
 
-### Step 4: Collaboration
-
-```mermaid
-sequenceDiagram
-    accTitle: Step 4 pair collaboration
-    accDescr: Pairs are chosen by proximity, one near pair for depth and one cross-cluster pair for breadth. The initiator leads and the collaborator critiques and asks clarifying questions but cannot run tools. The output is one joint note with a novelty check against the archive.
-
-    participant R as Registry
-    participant I as Paper C (initiator)
-    participant K as Paper D (collaborator)
-    participant AR as Archive
-    participant E as events.jsonl
-
-    R-->>I: near pair or cross-cluster pair (Co-Scientist Proximity)
-    I->>K: establish_collaboration (ASCollab)
-    K->>I: clarifying questions first (ChatDev dehallucination)
-    I->>K: proposal: C's method on D's data could test X
-    K-->>I: critique, cannot run tools
-    I->>AR: novelty check (kNN distance, AgentRxiv dedup)
-    alt novel
-        I->>E: joint note, parents C and D, edge green
-    else overlaps archive
-        I->>E: dropped, reason logged
+    rect rgb(235, 255, 240)
+        Note over C,W: Meeting 3: chair's summary
+        C->>W: decisions, must choose one per question, next agenda
+        W->>W: events.jsonl, Zotero notes
+        W-->>S: minutes
     end
 ```
 
-### Step 5: Meta-review and archive
+Rules that keep it short:
 
-```mermaid
-sequenceDiagram
-    accTitle: Step 5 meta-review tournament and archive write-back
-    accDescr: Notes are clustered into tournaments of four. The meta-reviewer sees reviews, verdicts and random archive samples, then ranks strictly. The top fraction passes the gate, enters the archive and is written back to Zotero. The meta-reviewer also writes the digest for the next round.
-
-    participant E as events.jsonl
-    participant M as Meta-reviewer
-    participant AR as Archive
-    participant RG as Registry
-    participant Z as Zotero
-
-    E->>M: reviews + verdicts, clustered into tournaments of 4 (ASCollab L=4)
-    AR-->>M: random samples for calibration
-    M->>M: score 0-1, strict rank, no ties
-    M->>E: accept top 25-50%
-    Note over M,AR: gate: quotes string-match source,<br/>>= 2 uninvolved reviewers accept,<br/>rubric >= threshold
-    E->>AR: accepted notes, tagged verified / unverified (AgentRxiv)
-    AR->>RG: citations update #accepted, #citations
-    E->>Z: note on each paper involved
-    M-->>E: digest for next round (Co-Scientist meta-review)
-```
+- Group meetings use one shared transcript each; the lead speaks first and last (Virtual Lab round structure).
+- Only the lead's summary reaches the plenary; transcripts stay in the group (Virtual Lab: summaries only cross meetings).
+- Disputes are 2 turns, judged by the convener with the critic's evidence check. `unresolved` goes to the scientist.
+- The convener must choose one answer per agenda question (Virtual Lab: agents hedge unless forced).
 
 ---
 
-## 🌙 Three cycles overnight
+## 🌙 Three sessions overnight
 
-The same five steps run three times. What differs is the state each round starts from. The cycle count is capped at 3-4 because LLM-judged loops flatten after about four rounds (Du et al.) and compounding is only documented with an external evaluator ([rsi.md](rsi.md) §c).
+Three sessions, each with a different purpose, the way a reading group would run a series.
 
 ```mermaid
 flowchart LR
-    accTitle: Three cycles and what carries between them
-    accDescr: Round one starts cold with an empty archive and no digest. Round two starts with the archive, the first digest and updated reputation. Round three adds Elo-prioritised review and unresolved disputes carried forward. After round three the scientist triages in the morning.
+    accTitle: Three sessions overnight
+    accDescr: Session one is introductions, where every paper presents inside its group. Session two is the debate, where the convener raises the conflicts found in session one. Session three is proposals, where groups pair up and the final minutes are written for the scientist.
 
-    agenda["🧑‍🔬 Agenda<br/>Friday 10 pm"]
-    r1["🔵 Round 1<br/>cold start<br/>empty archive, no digest<br/>random reviewer load"]
-    r2["🟢 Round 2<br/>warm<br/>archive seeded, digest #1<br/>reputation updated"]
-    r3["🟣 Round 3<br/>focused<br/>Elo picks what to review first<br/>unresolved carried forward"]
-    triage["☀️ Morning triage<br/>unresolved to scientist<br/>minutes + network view"]
+    agenda["🧑‍🔬 Agenda<br/>10 pm"]
+    s1["🔵 Session 1: Introductions<br/>every paper presents in its group<br/>leads map claims and conflicts"]
+    s2["🟠 Session 2: Debate<br/>plenary on the conflicts<br/>verdicts: stands / contested / unresolved"]
+    s3["🟢 Session 3: Proposals<br/>cross-group pairs propose ideas<br/>final minutes"]
+    morning["☀️ Morning<br/>minutes, Zotero notes,<br/>unresolved for the scientist"]
 
-    agenda --> r1
-    r1 -- "archive, digest #1,<br/>registry stats" --> r2
-    r2 -- "archive, digest #2,<br/>Elo from dispute outcomes" --> r3
-    r3 --> triage
+    agenda --> s1
+    s1 -- "claim map, conflict list" --> s2
+    s2 -- "verdicts" --> s3
+    s3 --> morning
 
-    classDef cold fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
-    classDef warm fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
-    classDef focus fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
-    classDef person fill:#ffedd5,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    classDef one fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
+    classDef two fill:#ffedd5,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    classDef three fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef person fill:#fef9c3,stroke:#ca8a04,stroke-width:2px,color:#713f12
 
-    class r1 cold
-    class r2 warm
-    class r3 focus
-    class agenda,triage person
+    class s1 one
+    class s2 two
+    class s3 three
+    class agenda,morning person
 ```
 
-### Cycle 1: cold start
+### Session 1: Introductions
 
-Worked example with five papers from a 20-paper library: A, B (large cohort, same question as A), C (method paper), D (dataset paper), E (unrelated cluster).
+Every paper presents once inside its group (6-7 presentations per group, two discussants each). The lead's summary lists each paper's main claim and marks where two members disagree. Plenary is short: the convener collects the three claim maps and writes the conflict list for session 2.
 
-```mermaid
-sequenceDiagram
-    accTitle: Cycle 1 cold start
-    accDescr: Round one. Agents are created from paper cards. Reviewers are matched by similarity only, since no reputation exists. Paper B questions Paper A's effect size, opening the first dispute, which the judge rules contested. C and D form the first collaboration. The archive receives its first accepted notes and the meta-reviewer writes the first digest.
+Output: claim per paper, conflict list, first Zotero notes ("presented at the club; discussants said ...").
 
-    participant H as Scientist
-    participant S as Society (A..T)
-    participant RG as Registry
-    participant RV as Reviewers
-    participant J as Judge
-    participant M as Meta-reviewer
-    participant AR as Archive
+### Session 2: Debate
 
-    H->>S: agenda: "Is X a good target?"
-    Note over S: 20 agents built from paper cards<br/>no digest, no archive
-    S->>RG: register expertise embeddings (all #citations = 0)
-    S->>RV: 20 notes, 60 reviews (similarity only)
-    RV->>M: scores
-    Note over RV: B (larger cohort) questions A's effect size
-    RV->>J: A vs B: recs differ by 2
-    J->>J: 3 turns, A defends, B counters
-    J-->>AR: contested: A's claim kept, B's counter linked
-    S->>S: C + D: "C's method on D's data could test X"
-    S->>AR: joint note C+D (novel: archive empty)
-    M->>AR: accept top 25%: 5 notes incl. C+D
-    AR->>RG: C, D gain #accepted; B gains citation from A's note
-    M-->>S: digest #1: "effect sizes without cohort size lost"
-```
+No group meetings. The convener takes the conflict list to the plenary. For each conflict: the owning paper defends, the challenger counters, 2 turns; the critic says which side's quotes hold; the convener rules `stands`, `contested` or `unresolved`. Cap at 5 disputes.
 
-Events written: 60 reviews, 1 dispute (red edge A-B), 1 collaboration (green edge C-D), 5 findings.
+Output: a verdict per conflict, red edges in the network view, `unresolved` list for the scientist.
 
-### Cycle 2: warm
+### Session 3: Proposals
 
-```mermaid
-sequenceDiagram
-    accTitle: Cycle 2 warm start
-    accDescr: Round two. Every agent reads digest one and retrieves archive hits before acting. Reviewer matching now weights reputation, so C and D are found more often. Paper E, from a distant cluster, is pulled in as a far reviewer and challenges the C plus D note. The judge rules that it stands. A revises its claim in light of the contested verdict. The archive grows and the digest is updated.
+Groups meet again, but each group is paired with another: Group 1 with Group 2, Group 2 with Group 3, Group 3 with Group 1. The lead of each pair picks one paper from each side and asks for a combination ("Paper C's method on Paper D's data could test X"). The critic checks feasibility. The convener keeps the best proposal per pair and writes the final minutes.
 
-    participant S as Society (A..T)
-    participant RG as Registry
-    participant AR as Archive
-    participant RV as Reviewers
-    participant J as Judge
-    participant M as Meta-reviewer
-    participant E as events.jsonl
+Output: up to 3 proposals, green edges, final minutes: "Your 20 papers presented in 3 groups, raised 4 disputes (2 stand, 1 contested, 1 for you), and proposed 3 ideas."
 
-    M-->>S: digest #1 + each agent's lowest score (ASCollab exp 04)
-    S->>AR: retrieve top-k (0.2 citation boost)
-    AR-->>S: round-1 accepted notes
-    Note over S: A re-states claim with cohort size<br/>(non-greedy: not every agent revisits, DGM few-children bonus)
-    S->>RG: find reviewers: 0.8 sim + 0.2 citations
-    RG-->>S: C and D now ranked higher
-    S->>RV: 20 notes, 60 reviews; E drawn as far reviewer for C+D
-    RV->>J: E vs C+D: E scores Soundness 1
-    J->>J: 3 turns, different model
-    J-->>E: stands: E's objection does not apply to D's data
-    S->>S: A + B pair: joint note reconciling effect sizes (near pair)
-    S->>S: C + E pair: cross-cluster, dropped (vague, ResearchTown)
-    M->>AR: accept top 25%: A+B joint note, A revised, 3 others
-    AR->>RG: reputation: A, B, C, D up
-    M-->>S: digest #2: "cross-cluster proposals lost on specificity"
-```
+### What changes between sessions
 
-Events written: 60 reviews, 1 dispute (stands), 2 collaborations (1 accepted, 1 dropped), 5 findings. Red edge A-B from round 1 now has a green edge beside it.
-
-### Cycle 3: focused
-
-```mermaid
-sequenceDiagram
-    accTitle: Cycle 3 focused round
-    accDescr: Round three. Elo computed from dispute outcomes decides which notes are reviewed first. The long-range edge is rewired to the two most divergent agents. A new dispute between D and a late paper hits the turn cap without a verdict and is marked unresolved for the scientist. The round ends with Zotero write-back and the minutes.
-
-    participant S as Society (A..T)
-    participant RG as Registry
-    participant RV as Reviewers
-    participant J as Judge
-    participant M as Meta-reviewer
-    participant AR as Archive
-    participant Z as Zotero
-    participant H as Scientist
-
-    M-->>S: digest #2, Elo ranking of claims
-    Note over S: long-range edge rewired: D <-> P<br/>(most divergent claims, small-world)
-    S->>RV: Elo-ordered: contested and high-Elo notes reviewed first
-    RV->>J: D vs P: P claims D's dataset has batch effects
-    J->>J: 3 turns, no discriminative verdict
-    J-->>AR: unresolved
-    S->>S: B + C pair: B's cohort with C's method
-    M->>AR: accept top 25%: B+C note, 4 others
-    Note over M,AR: gate: all quotes string-matched, >= 2 uninvolved accept
-    AR->>Z: notes on A, B, C, D, P: findings, verdicts, citations
-    AR->>H: minutes: "3 rounds, 3 disputes (1 stands, 1 contested, 1 unresolved),<br/>4 collaborations proposed, 15 findings passed"
-    AR->>H: unresolved D vs P for triage
-    Note over H: no "rounds got better" claim without an external check<br/>(citation string-match pass rate per round is the cheap one)
-```
-
-### What changes between cycles
-
-| State | Cycle 1 | Cycle 2 | Cycle 3 |
+| | Session 1 | Session 2 | Session 3 |
 | --- | --- | --- | --- |
-| Archive | Empty | Round-1 accepted notes | Rounds 1-2 |
-| Digest to agents | None | #1: why things lost | #2 + Elo ranking |
-| Reviewer matching | Similarity only | 0.8 sim + 0.2 citations | Same, Elo decides review order |
-| Long-range edge | Random | Random | Rewired to most divergent pair |
-| Disputes | Opened by clashing claims | Also by reviewer disagreement | Unresolved carried to human |
-| Collaboration pairs | Near pairs | Near + one cross-cluster | Pairs that won disputes |
-| Zotero | Nothing | Nothing | Write-back of all passed findings |
-| Checkpoint | After every step | After every step | After every step, then stop |
+| Who meets | Groups, in parallel | Plenary only | Paired groups |
+| Who speaks | Every paper once | Only the papers in conflict | One pair per group pairing |
+| Convener decides | Conflict list | Verdicts | Which proposals to keep |
+| Critic checks | Quotes exist | Whose evidence holds | Feasibility |
+| Scribe writes | Claim per paper | Verdict per dispute | Proposals, final minutes |
 
-Budget per cycle, ~20 papers: 20 sessions + 60 reviews + ~3 disputes × 3 turns × 3 agents + ~3 collaborations + 5 meta-reviews, roughly 130-150 LLM calls. Three cycles ≈ 450 calls. Measure cycle 1 before 10 pm and extrapolate; no source paper reports a dollar figure.
+### Budget
+
+Session 1: 20 presentations × (1 + 2 discussants + critic + lead) ≈ 100 calls. Session 2: ≤5 disputes × ~6 calls ≈ 30. Session 3: 3 pairings × ~8 calls ≈ 25. Chair and scribe overhead ≈ 20. **About 175 calls for the whole night**, which leaves room to run it twice.
 
 ---
 
-## Sources
+## Why hierarchical, given the review
 
-Every element above is traced in the track files: [ascollab.md](ascollab.md) (flat society, registry, archive, K=2 blind review, tournament meta-review, no dispute mechanism), [virtual_lab.md](virtual_lab.md) (four-field agents, standing critic, structured summaries, human share of words), [organisation_structure.md](organisation_structure.md) (MacNet topology, small-world rewiring, AgentReview blinding and numeric scores, ResearchTown reviewer matching, Liang MAD judge, Smit devil's-advocate result, ChatDev dehallucination, Co-Scientist proximity and meta-review, AgentRxiv verification tags), [rsi.md](rsi.md) (DGM never-discard archive and non-greedy selection, Du et al. four-round saturation, ASCollab exp 04 self-reflection, the external-evaluator caveat).
+The evidence in [organisation_structure.md](organisation_structure.md) favours sparse, mediated communication over broadcast, and a chair who synthesises over free debate: Virtual Lab's PI synthesis each round, MetaGPT and ChatDev passing only artifacts between stages, MacNet's finding that only final outputs should travel along edges, and Du et al.'s saturation after a few rounds. A journal club gives that structure for free and is what the scientist already recognises. ASCollab's flat society is kept only in the review rubric and the archive; its lack of any dispute step is what session 2 fills.
