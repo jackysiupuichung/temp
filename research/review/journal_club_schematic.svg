@@ -1,0 +1,200 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 815" width="1000" height="815" font-family="Helvetica, Arial, sans-serif">
+  <title>Library Journal Club organisation schematic</title>
+  <desc>Hierarchical journal club: the scientist sets the agenda for a convener, who chairs with a critic and a scribe. Three topic groups each have a group lead, a presenter, two discussants and members. The scribe writes to the archive, Zotero and the minutes, which return to the scientist. Numbered arrows give the order of one session; the band at the bottom lists the three overnight sessions.</desc>
+  <style>
+    .t { font-size: 12px; fill: #1f2937; }
+    .ts { font-size: 10.5px; fill: #4b5563; }
+    .tb { font-size: 12.5px; font-weight: 700; fill: #1f2937; }
+    .title { font-size: 20px; font-weight: 700; fill: #111827; }
+    .sub { font-size: 12px; fill: #4b5563; }
+    .lbl { font-size: 11px; font-weight: 700; fill: #374151; }
+    .cont { fill: none; stroke: #6b7280; stroke-width: 1.2; stroke-dasharray: 5 4; }
+    .contlbl { font-size: 12px; font-weight: 700; fill: #374151; }
+    .scientist { fill: #ffe6cc; stroke: #d79b00; stroke-width: 1.5; }
+    .chair { fill: #f8cecc; stroke: #b85450; stroke-width: 1.5; }
+    .lead { fill: #e1d5e7; stroke: #9673a6; stroke-width: 1.5; }
+    .paper { fill: #ffffff; stroke: #6c8ebf; stroke-width: 1.5; }
+    .groupbox { fill: #dae8fc; stroke: #6c8ebf; stroke-width: 1.5; }
+    .archive { fill: #fff2cc; stroke: #d6b656; stroke-width: 1.5; }
+    .output { fill: #d5e8d4; stroke: #82b366; stroke-width: 1.5; }
+    .session { fill: #f5f5f5; stroke: #666666; stroke-width: 1.5; }
+    .edge { fill: none; stroke: #374151; stroke-width: 1.6; }
+    .edge2 { fill: none; stroke: #374151; stroke-width: 1.6; stroke-dasharray: 5 3; }
+    .num { fill: #111827; }
+    .numt { font-size: 10px; font-weight: 700; fill: #ffffff; }
+  </style>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#374151"/>
+    </marker>
+    <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 2h6v2h-1v5l6 10a2 2 0 0 1-1.7 3H5.7A2 2 0 0 1 4 19l6-10V4H9z"/></symbol>
+    <symbol id="i-gavel" viewBox="0 0 24 24"><rect x="2" y="19" width="10" height="3" rx="1"/><rect x="5" y="9" width="12" height="4" rx="1" transform="rotate(-45 11 11)"/><rect x="12" y="1" width="5" height="9" rx="1" transform="rotate(-45 14.5 5.5)"/></symbol>
+    <symbol id="i-magnifier" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6" fill="none" stroke-width="2.6"/><path d="M14.5 14.5l6.5 6.5" stroke-width="3" stroke-linecap="round"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M3 21l3.5-1L18 8.5l-2.5-2.5L4 17.5z"/><path d="M16.5 5l2-2 2.5 2.5-2 2z"/></symbol>
+    <symbol id="i-lead" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M1 21c0-4 3.5-7 8-7s8 3 8 7z"/><polygon points="19,2 20.3,5.2 23.5,5.5 21,7.8 21.8,11 19,9.3 16.2,11 17,7.8 14.5,5.5 17.7,5.2"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M5 2h9l5 5v15H5z" stroke-width="1.6"/><path d="M14 2v5h5M8 12h8M8 15h8M8 18h5" fill="none" stroke-width="1.6"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5" fill="none" stroke-width="2"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" fill="none" stroke-width="2"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M3 3h8v18H3z"/><path d="M13 3h8v18h-8z"/></symbol>
+    <symbol id="i-minutes" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="18" rx="2" fill="none" stroke-width="2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M8 11h8M8 15h8M8 19h5" fill="none" stroke-width="1.8"/></symbol>
+  </defs>
+
+  <rect x="0" y="0" width="1000" height="815" fill="#ffffff"/>
+
+  <text x="30" y="36" class="title">Library Journal Club — organisation schematic</text>
+  <text x="30" y="56" class="sub">A hierarchical journal club: scientist → convener → group leads → papers. Numbers 1–9 give the order of events in one session.</text>
+
+  <!-- Scientist -->
+  <rect x="30" y="85" width="170" height="90" rx="8" class="scientist"/>
+  <use href="#i-flask" x="42" y="98" width="30" height="30" fill="#d79b00"/>
+  <text x="82" y="112" class="tb">Scientist</text>
+  <text x="82" y="128" class="ts">sets the agenda once</text>
+  <text x="82" y="142" class="ts">reads the minutes</text>
+  <text x="82" y="156" class="ts">settles "unresolved"</text>
+
+  <!-- Chair container -->
+  <rect x="300" y="68" width="640" height="162" rx="6" class="cont"/>
+  <text x="310" y="83" class="contlbl">Chair</text>
+
+  <rect x="520" y="85" width="200" height="60" rx="8" class="chair"/>
+  <use href="#i-gavel" x="530" y="100" width="28" height="28" fill="#b85450"/>
+  <text x="566" y="106" class="tb">Convener</text>
+  <text x="566" y="121" class="ts">chairs, synthesises, decides</text>
+  <text x="566" y="135" class="ts">must "choose one"</text>
+
+  <rect x="320" y="160" width="200" height="55" rx="8" class="chair"/>
+  <use href="#i-magnifier" x="330" y="174" width="26" height="26" fill="#b85450" stroke="#b85450"/>
+  <text x="366" y="180" class="tb">Critic</text>
+  <text x="366" y="195" class="ts">rigour; do the quotes exist</text>
+  <text x="366" y="208" class="ts">in the source? feedback only</text>
+
+  <rect x="720" y="160" width="200" height="55" rx="8" class="chair"/>
+  <use href="#i-pen" x="730" y="174" width="26" height="26" fill="#b85450"/>
+  <text x="766" y="180" class="tb">Scribe</text>
+  <text x="766" y="195" class="ts">structured summary,</text>
+  <text x="766" y="208" class="ts">events.jsonl, Zotero notes</text>
+
+  <!-- 1 agenda -->
+  <path d="M200 105H520" class="edge" marker-end="url(#ah)"/>
+  <circle cx="260" cy="105" r="9" class="num"/><text x="260" y="108.5" class="numt" text-anchor="middle">1</text>
+  <text x="275" y="100" class="t">agenda question</text>
+
+  <!-- critic -> convener -->
+  <path d="M420 160V130H520" class="edge" marker-end="url(#ah)"/>
+  <text x="428" y="126" class="ts">evidence check</text>
+
+  <!-- 6 convener -> scribe -->
+  <path d="M720 130H820V160" class="edge" marker-end="url(#ah)"/>
+  <circle cx="770" cy="130" r="9" class="num"/><text x="770" y="133.5" class="numt" text-anchor="middle">6</text>
+  <text x="812" y="152" class="ts" text-anchor="end">decisions, verdicts</text>
+
+  <!-- 2/4 bus convener <-> leads -->
+  <path d="M620 145V250" class="edge" marker-start="url(#ah)"/>
+  <path d="M335 250H835" class="edge"/>
+  <path d="M335 250V318" class="edge" marker-end="url(#ah)"/>
+  <path d="M585 250V318" class="edge" marker-end="url(#ah)"/>
+  <path d="M835 250V318" class="edge" marker-end="url(#ah)"/>
+  <circle cx="620" cy="200" r="9" class="num"/><text x="620" y="203.5" class="numt" text-anchor="middle">2</text>
+  <text x="634" y="196" class="t">agenda ↓</text>
+  <circle cx="620" cy="226" r="9" class="num"/><text x="620" y="229.5" class="numt" text-anchor="middle">4</text>
+  <text x="634" y="222" class="t">summaries ↑</text>
+
+  <!-- 5 critic -> every meeting -->
+  <path d="M340 215V265" class="edge2" marker-end="url(#ah)"/>
+  <circle cx="318" cy="238" r="9" class="num"/><text x="318" y="241.5" class="numt" text-anchor="middle">5</text>
+  <text x="206" y="242" class="ts">sits in every meeting</text>
+
+  <!-- Groups container -->
+  <rect x="200" y="265" width="760" height="290" rx="6" class="cont"/>
+  <text x="210" y="280" class="contlbl">Topic groups (20 papers clustered by similarity, 6–7 each)</text>
+
+  <!-- group template x3 -->
+  <g id="g1">
+    <rect x="220" y="290" width="230" height="250" rx="6" class="groupbox"/>
+    <text x="335" y="308" class="lbl" text-anchor="middle">Group 1 · topic A</text>
+    <rect x="235" y="318" width="200" height="46" rx="6" class="lead"/>
+    <use href="#i-lead" x="243" y="329" width="24" height="24" fill="#9673a6"/>
+    <text x="275" y="336" class="tb">Group lead</text>
+    <text x="275" y="351" class="ts">most central paper; moderates</text>
+    <rect x="235" y="376" width="200" height="40" rx="6" class="paper"/>
+    <use href="#i-doc" x="243" y="384" width="24" height="24" fill="#ffffff" stroke="#6c8ebf"/>
+    <text x="275" y="392" class="tb">Presenter</text>
+    <text x="275" y="406" class="ts">claim, evidence, limits</text>
+    <rect x="235" y="428" width="95" height="40" rx="6" class="paper"/>
+    <use href="#i-doc" x="240" y="436" width="22" height="22" fill="#ffffff" stroke="#6c8ebf"/>
+    <text x="266" y="444" class="tb">Discussant</text>
+    <text x="266" y="458" class="ts">nearest</text>
+    <rect x="340" y="428" width="95" height="40" rx="6" class="paper"/>
+    <use href="#i-doc" x="345" y="436" width="22" height="22" fill="#ffffff" stroke="#6c8ebf"/>
+    <text x="371" y="444" class="tb">Discussant</text>
+    <text x="371" y="458" class="ts">2nd nearest</text>
+    <rect x="235" y="480" width="200" height="40" rx="6" class="paper"/>
+    <use href="#i-doc" x="243" y="488" width="24" height="24" fill="#ffffff" stroke="#6c8ebf"/>
+    <text x="275" y="496" class="tb">Members</text>
+    <text x="275" y="510" class="ts">may "pass" or disagree</text>
+    <!-- 3 present -> discuss -> lead -->
+    <path d="M335 416V422H282V428" class="edge" marker-end="url(#ah)"/>
+    <path d="M335 422H387V428" class="edge" marker-end="url(#ah)"/>
+    <path d="M235 448H227V341H235" class="edge" marker-end="url(#ah)"/>
+    <circle cx="335" cy="370" r="9" class="num"/><text x="335" y="373.5" class="numt" text-anchor="middle">3</text>
+  </g>
+  <use href="#g1" x="250" y="0"/>
+  <use href="#g1" x="500" y="0"/>
+  <rect x="470" y="298" width="230" height="14" fill="#dae8fc"/>
+  <text x="585" y="308" class="lbl" text-anchor="middle">Group 2 · topic B</text>
+  <rect x="720" y="298" width="230" height="14" fill="#dae8fc"/>
+  <text x="835" y="308" class="lbl" text-anchor="middle">Group 3 · topic C</text>
+  <text x="335" y="533" class="ts" text-anchor="middle">present → discuss → check → summarise</text>
+  <text x="585" y="533" class="ts" text-anchor="middle">same, in parallel</text>
+  <text x="835" y="533" class="ts" text-anchor="middle">same, in parallel</text>
+
+  <!-- 7 scribe -> archive -->
+  <path d="M920 187H975V625H940" class="edge" marker-end="url(#ah)"/>
+  <circle cx="975" cy="400" r="9" class="num"/><text x="975" y="403.5" class="numt" text-anchor="middle">7</text>
+  <text x="988" y="320" class="t" transform="rotate(90 988 320)">append to events.jsonl after every meeting</text>
+
+  <!-- Bottom row -->
+  <rect x="740" y="590" width="200" height="70" rx="8" class="archive"/>
+  <use href="#i-db" x="750" y="610" width="30" height="30" fill="#d6b656" stroke="#d6b656"/>
+  <text x="790" y="612" class="tb">Archive</text>
+  <text x="790" y="627" class="ts">events.jsonl, never discard</text>
+  <text x="790" y="641" class="ts">claims, verdicts, proposals</text>
+
+  <rect x="500" y="590" width="180" height="70" rx="8" class="output"/>
+  <use href="#i-book" x="510" y="610" width="30" height="30" fill="#82b366"/>
+  <text x="550" y="612" class="tb">Zotero</text>
+  <text x="550" y="627" class="ts">a note on each paper</text>
+  <text x="550" y="641" class="ts">that was involved</text>
+
+  <rect x="260" y="590" width="180" height="70" rx="8" class="output"/>
+  <use href="#i-minutes" x="270" y="610" width="30" height="30" fill="#82b366" stroke="#82b366"/>
+  <text x="310" y="612" class="tb">Minutes</text>
+  <text x="310" y="627" class="ts">+ network view:</text>
+  <text x="310" y="641" class="ts">green collab, red dispute</text>
+
+  <!-- 8 archive -> zotero, minutes -->
+  <path d="M740 625H680" class="edge" marker-end="url(#ah)"/>
+  <circle cx="710" cy="625" r="9" class="num"/><text x="710" y="628.5" class="numt" text-anchor="middle">8</text>
+  <path d="M840 660V680H350V660" class="edge" marker-end="url(#ah)"/>
+  <circle cx="600" cy="680" r="9" class="num"/><text x="600" y="683.5" class="numt" text-anchor="middle">8</text>
+  <text x="612" y="675" class="ts">written back after session 3</text>
+
+  <!-- 9 minutes -> scientist -->
+  <path d="M260 625H120V175" class="edge" marker-end="url(#ah)"/>
+  <circle cx="120" cy="400" r="9" class="num"/><text x="120" y="403.5" class="numt" text-anchor="middle">9</text>
+  <text x="134" y="404" class="t">in the morning</text>
+
+  <!-- Session band -->
+  <rect x="30" y="715" width="945" height="80" rx="6" class="cont"/>
+  <text x="40" y="731" class="contlbl">Overnight: the same hierarchy runs three sessions</text>
+  <rect x="45" y="742" width="290" height="40" rx="6" class="session"/>
+  <text x="55" y="759" class="tb">Session 1 · Introductions</text>
+  <text x="55" y="774" class="ts">every paper presents in its group; leads list the conflicts</text>
+  <path d="M335 762H355" class="edge" marker-end="url(#ah)"/>
+  <rect x="355" y="742" width="290" height="40" rx="6" class="session"/>
+  <text x="365" y="759" class="tb">Session 2 · Debate</text>
+  <text x="365" y="774" class="ts">plenary on the conflicts; stands / contested / unresolved</text>
+  <path d="M645 762H665" class="edge" marker-end="url(#ah)"/>
+  <rect x="665" y="742" width="295" height="40" rx="6" class="session"/>
+  <text x="675" y="759" class="tb">Session 3 · Proposals</text>
+  <text x="675" y="774" class="ts">groups pair up, one idea per pair; final minutes</text>
+</svg>
