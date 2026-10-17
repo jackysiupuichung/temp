@@ -1,0 +1,111 @@
+{
+  "id": "efstathiou2024",
+  "citekey": "efstathiou2024",
+  "title": "Evolving Dark Energy or Supernovae Systematics?",
+  "year": 2024,
+  "date": "2024-08-13",
+  "authors": [
+    "George Efstathiou"
+  ],
+  "abstract": "arXiv:2408.07175. The paper asks whether the DESI Year-1 evidence for evolving dark energy is real or an artefact of the Type Ia supernova (SN) compilation paired with the BAO and CMB data. DESI's significance ranges from 2.5 sigma with Pantheon+ to 3.9 sigma with DES5Y, so the author fits each public catalogue alone (1417 Pantheon+ and 1754 DES5Y SN at 0.02 < z < 1.2) against Planck LCDM and a w0-wa model. Pantheon+ alone is consistent with Planck LCDM and gains nothing from a time-varying equation of state; DES5Y alone disfavours Planck LCDM at roughly 3 sigma (delta chi-squared 12.5; only about 2 sigma over its own LCDM fit) and wants high Omega_m, w0 > -1 and strongly negative wa. The key diagnostic compares SN in both catalogues. With the 145 common DES SN used as the zero-point reference (only the low-to-high-redshift differential matters), the 118 common Foundation SN and most other low-redshift samples are offset by about 0.04-0.05 mag. Subtracting 0.04 mag from the DES5Y low-redshift subsample removes its preference for evolving dark energy and restores agreement with Pantheon+ and Planck. The paper concludes that claims of dynamical dark energy need low-to-high-redshift photometric consistency well below 0.04 mag, and leaves open whether the offset reflects errors in Pantheon+, DES5Y, or both. The DES collaboration's follow-up inventory attributes it partly to selection-function differences between DES spectroscopic and full photometric samples and partly to improved intrinsic-scatter and host-mass modelling, leaving about 0.008 mag unexplained and no reason to change DES5Y.",
+  "claims": [
+    {
+      "text": "The strength of the DESI evidence for evolving dark energy depends strongly on the SN sample, ranging from about 3.9 sigma with DES5Y to about 2.5 sigma with Pantheon+.",
+      "quote": {
+        "paper_id": "efstathiou2024",
+        "text": "The strength of the evidence for evolving dark energy ranges from ∼ 3.9σ for the Dark Energy 5 year (DES5Y) SN sample to ∼ 2.5σ for the Pantheon+ sample.",
+        "loc": "Abstract"
+      }
+    },
+    {
+      "text": "The Pantheon+ SN sample on its own is consistent with the Planck LCDM model and shows no preference for a time-varying equation of state.",
+      "quote": {
+        "paper_id": "efstathiou2024",
+        "text": "The cosmology inferred from Pantheon+ sample alone is consistent with the Planck ΛCDM model and shows no preference for evolving dark energy.",
+        "loc": "Abstract"
+      }
+    },
+    {
+      "text": "DES5Y alone prefers evolving dark energy, improving chi-squared by 12.5 relative to the Planck LCDM fit (disfavouring it at roughly 3 sigma) but only by 7.4 relative to DES5Y's own best-fit LCDM, about 2 sigma.",
+      "quote": {
+        "paper_id": "efstathiou2024",
+        "text": "Thus, the Planck ΛCDM cosmology is strongly disfavoured by the DES5Y data (at roughly 3σ), and evolving dark energy is preferred over the best fit DES5Y ΛCDM cosmology at ∼ 2σ.",
+        "loc": "Sec. 2"
+      }
+    },
+    {
+      "text": "SN common to both catalogues reveal that most low-redshift surveys in DES5Y are offset by about 0.04-0.05 mag relative to the more distant DES SN.",
+      "quote": {
+        "paper_id": "efstathiou2024",
+        "text": "Most of the low redshift surveys are offset by ∼ 0.04−0.05 mag. relative to the more distant DES supernovae.",
+        "loc": "Sec. 3"
+      }
+    },
+    {
+      "text": "Subtracting 0.04 mag from the DES5Y low-redshift subsample removes the statistically significant preference for evolving dark energy.",
+      "quote": {
+        "paper_id": "efstathiou2024",
+        "text": "Evidently, the recalibrated DES5Y catalogue does not show a statistically significant preference for a time varying equation-of-state.",
+        "loc": "Sec. 3"
+      }
+    },
+    {
+      "text": "DESI BAO combined with Pantheon+ is consistent with LCDM, so the roughly 3 sigma preference for dynamical dark energy in the BAO+SN combination is driven by DES5Y.",
+      "quote": {
+        "paper_id": "efstathiou2024",
+        "text": "Fig. 8 shows clearly that the ∼ 3σ evidence for dynamical dark energy apparent in lower panel is driven by the DES5Y SN.",
+        "loc": "Appendix A"
+      }
+    }
+  ],
+  "methods": [
+    "Fit the unbinned Pantheon+ and DES5Y Hubble diagrams, using full covariance matrices, to Planck LCDM and to the w0-wa (CPL) parameterisation; binned residuals are shown for display only.",
+    "Convert DES5Y distance moduli to the Pantheon+ magnitude system with a constant offset (mDES = muDES - 19.33) fixed by the Planck LCDM fit to Pantheon+.",
+    "Compare magnitudes of SN present in both catalogues (145 DES Y3 SN, 118 Foundation SN, plus CfA and CSP samples), grouped by source survey.",
+    "Recompute parameter posteriors with MULTINEST after subtracting 0.04 mag from the DES5Y low-redshift subsamples, and combine each SN sample with DESI Y1 BAO using a Planck prior on the sound horizon."
+  ],
+  "data": [
+    "Pantheon+ SN catalogue (Scolnic et al. 2022): 1417 SN retained with 0.02 <= zHD <= 1.2, out of 1701 entries.",
+    "DES5Y SN catalogue (DES Collaboration 2024): 1754 SN retained after the same redshift cut and removal of SN with magnitude errors above 1, out of 1829.",
+    "Planck 2018 TTTEEE LCDM best fit (12.5cln chains) as the reference cosmology, and DESI Y1 BAO measurements in Appendix A.",
+    "Can an independent test of the BBC simulation framework and its large bias corrections for photometrically classified DES SN be constructed, since the DES systematics inventory is built entirely within BBC? (Sec. 5)",
+    "Is the step-function host-galaxy mass model an oversimplification, with SN colour and luminosity better tied to local stellar age, metallicity and star formation rate? (Sec. 5)",
+    "Can the complete ZTF sample at z < 0.06 be matched to a high-quality distant SN sample with smaller scatter and selection biases to settle the low-redshift calibration? (Sec. 5)",
+    "What is the impact on cosmology of applying the DES analysis improvements (intrinsic scatter model, host mass estimates, updated BBC code) to the full Pantheon+ compilation? (Sec. 4 and Sec. 5)"
+  ],
+  "limits": [
+    {
+      "text": "The paper regards it as controversial, not settled, whether the magnitude offsets it finds indicate systematic errors in one or both SN compilations.",
+      "quote": {
+        "paper_id": "efstathiou2024",
+        "text": "Whether the magnitudes offsets evident in Figs. 3 and 4 are indicative of systematic errors in one or both SN compilations is a more controversial question.",
+        "loc": "Sec. 3"
+      }
+    },
+    {
+      "text": "The Union3 compilation, which also gave high significance in DESI24, could not be analysed because its individual SN are not public.",
+      "quote": {
+        "paper_id": "efstathiou2024",
+        "text": "The Union3 compilation for individual SN is not yet in the public domain and would, in any case, require a very different type of analysis to that presented here.",
+        "loc": "Sec. 1"
+      }
+    },
+    {
+      "text": "The effect of the analysis differences identified by the DES collaboration on the full Pantheon+ catalogue has not been quantified.",
+      "quote": {
+        "paper_id": "efstathiou2024",
+        "text": "The impact of these analysis differences on the full Pantheon+ catalogue has not yet been quantified.",
+        "loc": "Sec. 4"
+      }
+    },
+    {
+      "text": "Even after the 0.04 mag correction, the DES5Y constraints remain skewed to high Omega_m because of a negative residual at z > 1 that depends on large bias corrections.",
+      "quote": {
+        "paper_id": "efstathiou2024",
+        "text": "The corrected DESY5 constraints are still skewed to high values of Ω m as a consequence of the negative residual at z >1 in Fig. 5",
+        "loc": "Sec. 3"
+      }
+    }
+  ],
+  "fulltext_excerpt": "---\nid: 2408.07175\ncitekey: efstathiou2024\ntitle: Evolving Dark Energy or Supernovae Systematics?\nyear: 2024\ndate: 2024-08-13\nauthors: [George Efstathiou]\narxiv: 2408.07175\nrole: before\n---\n\n# Executive summary\nThe paper asks whether the DESI Year-1 evidence for evolving dark energy is real or an artefact of the Type Ia supernova (SN) compilation paired with the BAO and CMB data. DESI's significance ranges from 2.5 sigma with Pantheon+ to 3.9 sigma with DES5Y, so the author fits each public catalogue alone (1417 Pantheon+ and 1754 DES5Y SN at 0.02 < z < 1.2) against Planck LCDM and a w0-wa model. Pantheon+ alone is consistent with Planck LCDM and gains nothing from a time-varying equation of state; DES5Y alone disfavours Planck LCDM at roughly 3 sigma (delta chi-squared 12.5; only about 2 sigma over its own LCDM fit) and wants high Omega_m, w0 > -1 and strongly negative wa. The key diagnostic compares SN in both catalogues. With the 145 common DES SN used as the zero-point reference (only the low-to-high-redshift differential matters), the 118 common Foundation SN and most other low-redshift samples are offset by about 0.04-0.05 mag. Subtracting 0.04 mag from the DES5Y low-redshift subsample removes its preference for evolving dark energy and restores agreement with Pantheon+ and Planck. The paper concludes that claims of dynamical dark energy need low-to-high-redshift photometric consistency well below 0.04 mag, and leaves open whether the offset reflects errors in Pantheon+, DES5Y, or both. The DES collaboration's follow-up inventory attributes it partly to selection-function differences between DES spectroscopic and full photometric samples and partly to improved intrinsic-scatter and host-mass modelling, leaving about 0.008 mag unexplained and no reason to change DES5Y.\n\n## Claims\n- claim: The strength of the DESI evidence for evolving dark energy depends strongly on the SN sample, ranging from about 3.9 sigma with DES5Y to about 2.5 sigma with Pantheon+.\n  quote: \"The strength of the evidence for evolving dark energy ranges from ∼ 3.9σ for the Dark Energy 5 year (DES5Y) SN sample to ∼ 2.5σ for the Pantheon+ sample.\"\n  loc: \"Abstract\"\n- claim: The Pantheon+ SN sample on its own is consistent with the Planck LCDM model and shows no preference for a time-varying equation of state.\n  quote: \"The cosmology inferred from Pantheon+ sample alone is consistent with the Planck ΛCDM model and shows no preference for evolving dark energy.\"\n  loc: \"Abstract\"\n- claim: DES5Y alone prefers evolving dark energy, improving chi-squared by 12.5 relative to the Planck LCDM fit (disfavouring it at roughly 3 sigma) but only by 7.4 relative to DES5Y's own best-fit LCDM, about 2 sigma.\n  quote: \"Thus, the Planck ΛCDM cosmology is strongly disfavoured by the DES5Y data (at roughly 3σ), and evolving dark energy is preferred over the best fit DES5Y ΛCDM cosmology at ∼ 2σ.\"\n  loc: \"Sec. 2\"\n- claim: SN common to both catalogues reveal that most low-redshift surveys in DES5Y are offset by about 0.04-0.05 mag relative to the more distant DES SN.\n  quote: \"Most of the low redshift surveys are offset by ∼ 0.04−0.05 mag. relative to the more distant DES supernovae.\"\n  loc: \"Sec. 3\"\n- claim: Subtracting 0.04 mag from the DES5Y low-redshift subsample removes the statistically significant preference for evolving dark energy.\n  quote: \"Evidently, the recalibrated DES5Y catalogue does not show a statistically significant preference for a time varying equation-of-state.\"\n  loc: \"Sec. 3\"\n- claim: DESI BAO combined with Pantheon+ is consistent with LCDM, so the roughly 3 sigma preference for dynamical dark energy in the BAO+SN combination is driven by DES5Y.\n  quote: \"Fig. 8 shows clearly that the ∼ 3σ evidence for dynamical dark energy apparent in lower panel is driven by the DES5Y SN.\"\n  loc: \"Appendix A\"\n\n## Methods\n- Fit the unbinned Pantheon+ and DES5Y Hubble diagrams, using full covariance matrices, to Planck LCDM and to the w0-wa (CPL) parameterisation; binned residuals are shown for display only.\n- Convert DES5Y distance moduli to the Pantheon+ magnitude system with a constant offset (mDES = muDES - 19.33) fixed by the Planck LCDM fit to Pantheon+.\n- Compare magnitudes of SN present in both catalogues (145 DES Y3 SN, 118 Foundation SN, plus CfA and CSP samples), grouped by source survey.\n- Recompute parameter posteriors with MULTINEST after subtracting 0.04 mag from the DES5Y low-redshift subsamples, and combine each SN sample with DESI Y1 BAO using a Planck prior on the sound horizon.\n\n## Data\n- Pantheon+ SN catalogue (Scolnic et al. 2022): 1417 SN retained with 0.02 <= zHD <= 1.2, out of 1701 entries.\n- DES5Y SN catalogue (DES Collaboration 2024): 1754 SN retained after the same redshift cut and removal of SN with magnitude errors above 1, out of 1829.\n- Planck 2018 TTTEEE LCDM best fit (12.5cln chains) as the reference cosmology, and DESI Y1 BAO measurements in Appendix A.\n\n## Limitations\n- limit: The paper regards it as controversial, not settled, whether the magnitude offsets it finds indicate systematic errors in one or both SN compilations.\n  quote: \"Whether the magnitudes offsets evident in Figs. 3 and 4 are indicative of systematic errors in one or both SN compilations is a more controversial question.\"\n  loc: \"Sec. 3\"\n- limit: The Union3 compilation, which also gave high significance in DESI24, could not be analysed because its individual SN are not public.\n  quote: \"The Union3 compilation for individual SN is not yet in the public domain and would, in any case, require a very different type of analysis to that presented here.\"\n  loc: \"Sec. 1\"\n- limit: The effect of the analysis differences identified by the DES collaboration on the full Pantheon+ catalogue has not been quantified.\n  quote: \"The impact of these analysis differences on the full Pantheon+ catalogue has not yet been quantified.\"\n  loc: \"Sec. 4\"\n- limit: Even after the 0.04 mag correction, the DES5Y constraints remain skewed to high Omega_m because of a negative residual at z > 1 that depends on large bias corrections.\n  quote: \"The corrected DESY5 constraints are still skewed to high values of Ω m as a consequence of the negative residual at z >1 in Fig. 5\"\n  loc: \"Sec. 3\"\n\n## Open questions\n- Can an independent test of the BBC simulation framework and its large bias corrections for photometrically classified DES SN be constructed, since the DES systematics inventory is built entirely within BBC? (Sec. 5)\n- Is the step-function host-galaxy mass model an oversimplification, with SN colour and luminosity better tied to local stellar age, metallicity and star formation rate? (Sec. 5)\n- Can the complete ZTF sample at z < 0.06 be matched to a high-quality distant SN sample with smaller scatter and selection biases to settle the low-redshift calibration? (Sec. 5)\n- What is the impact on cosmology of applying the DES analysis improvements (intrinsic scatter model, host mass estimates, updated BBC code) to the full Pantheon+ compilation? (Sec. 4 and Sec. 5)\n"
+}
