@@ -23,3 +23,15 @@ Result: 8 of 8 downloaded, 0 failed. All files pass the `file` check and the 50 
 Date check: all 8 v1 submission dates are before T = 2025-01-01 (earliest 2018-07-17, latest 2024-12-18). None flagged.
 
 Note: the PDFs were not opened or executed; verification used `file` and byte size only. For the collaboration papers the arXiv metadata lists the collaboration as first author; the first named individual is given in parentheses.
+
+## Version pinning (added 2026-10-17)
+
+The bare arXiv PDF URL serves the latest version, and three papers had versions posted after T = 2025-01-01. Those files were replaced with the last version before T:
+
+| arXiv | versions | on disk |
+|---|---|---|
+| 2401.02929 (DES-SN5YR) | v1 2024-01-05, v2 2024-01-08, v3 2024-06-07, v4 2025-07-20 | **v3** |
+| 2408.07175 (Efstathiou) | v1 2024-08-13, v2 2024-10-16, v3 2025-02-03 | **v2** |
+| 2412.13894 (Lewis & Chamberlain) | v1 2024-12-18, v2 2025-02-27, v3 2025-04-23 (uses DESI DR2) | **v1** |
+
+The other five have no version after T (2404.03002 v3 2024-11-04; 2404.03000 v1; 2404.03001 v4 2024-09-27; 1807.06209 v4 2021-08-09; 2007.08991 v2 2024-07-09).
