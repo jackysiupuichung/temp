@@ -5,6 +5,7 @@ import { useEditorStore } from '../store/editorStore';
 import { drawHighlights, drawPenStrokes } from '../ink/render';
 import { IconCopy, IconDuplicate, IconPalette, IconScissors, IconTrash } from './icons';
 import { Popover } from './Popover';
+import { editTextBox, isDoubleTap } from './TextBoxView';
 
 type Drag = { mode: 'move' | 'nw' | 'ne' | 'sw' | 'se'; pointerId: number; startX: number; startY: number; dx: number; dy: number; sx: number; sy: number };
 
@@ -13,6 +14,7 @@ export function SelectionOverlay({ page, zoom, bitmapScale, selection, strokes, 
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
   const drag = useRef<Drag | null>(null);
   const [colorOpen, setColorOpen] = useState(false);
   const { deleteSelection, duplicateSelection, copySelection, cutSelection, recolorSelection, commitSelectionTransform } = useEditorStore.getState();
@@ -34,6 +36,16 @@ export function SelectionOverlay({ page, zoom, bitmapScale, selection, strokes, 
 
   useEffect(() => () => { const c = canvasRef.current; if (c) { c.width = 0; c.height = 0; } }, []);
 
+  // The toolbar sits above the selection (below it near the top of the page), kept within the page.
+  const toolbarPos = (x: number, y: number, h: number) => ({
+    left: Math.max(0, Math.min(x * zoom, page.width * zoom - 240)),
+    top: y * zoom > 56 ? y * zoom - 52 : (y + h) * zoom + 8,
+  });
+  const placeToolbar = (p: { left: number; top: number }) => {
+    const tb = toolbarRef.current; if (!tb) return;
+    tb.style.left = `${p.left}px`; tb.style.top = `${p.top}px`;
+  };
+
   const applyTransform = (d: Drag) => {
     const t = `translate(${d.dx * zoom}px, ${d.dy * zoom}px)`;
     const originX = d.mode === 'nw' || d.mode === 'sw' ? r.x + r.width : r.x;
@@ -48,6 +60,12 @@ export function SelectionOverlay({ page, zoom, bitmapScale, selection, strokes, 
       b.style.transformOrigin = `${(originX - r.x) * zoom}px ${(originY - r.y) * zoom}px`;
       b.style.transform = `scale(${d.sx}, ${d.sy})`;
     }
+    // keep the toolbar with the selection while dragging
+    if (d.mode === 'move') placeToolbar(toolbarPos(r.x + d.dx, r.y + d.dy, r.height));
+    else {
+      const w = r.width * d.sx, h = r.height * d.sy;
+      placeToolbar(toolbarPos(originX === r.x ? r.x : originX - w, originY === r.y ? r.y : originY - h, h));
+    }
     // move the text boxes too (they are DOM)
     for (const id of selection.textBoxIds) {
       const el = document.querySelector<HTMLElement>(`[data-textbox-id="${id}"]`);
@@ -57,6 +75,7 @@ export function SelectionOverlay({ page, zoom, bitmapScale, selection, strokes, 
     }
   };
   const clearTransform = () => {
+    placeToolbar(toolbarPos(r.x, r.y, r.height));
     for (const el of [canvasRef.current, boxRef.current]) if (el) { el.style.transform = ''; el.style.transformOrigin = ''; }
     for (const id of selection.textBoxIds) { const el = document.querySelector<HTMLElement>(`[data-textbox-id="${id}"]`); if (el) { el.style.transform = ''; el.style.transformOrigin = ''; } }
   };
@@ -64,6 +83,11 @@ export function SelectionOverlay({ page, zoom, bitmapScale, selection, strokes, 
   const start = (mode: Drag['mode']) => (e: RPointerEvent<HTMLDivElement>) => {
     if (e.pointerType === 'touch' && useEditorStore.getState().penActive) return;
     e.stopPropagation(); e.preventDefault();
+    // double-click on a lone selected text box edits it
+    if (mode === 'move' && selection.strokeIds.length === 0 && selection.textBoxIds.length === 1 && isDoubleTap(selection.textBoxIds[0], e.timeStamp)) {
+      editTextBox(selection.textBoxIds[0], e);
+      return;
+    }
     try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch { /* synthetic event */ }
     drag.current = { mode, pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, dx: 0, dy: 0, sx: 1, sy: 1 };
   };
@@ -94,7 +118,6 @@ export function SelectionOverlay({ page, zoom, bitmapScale, selection, strokes, 
   };
 
   const left = r.x * zoom, top = r.y * zoom;
-  const toolbarTop = top > 56 ? top - 52 : top + r.height * zoom + 8;
   const anyHighlight = selected.some((s) => s.tool === 'highlighter');
 
   return (
@@ -109,7 +132,7 @@ export function SelectionOverlay({ page, zoom, bitmapScale, selection, strokes, 
           <div key={h} className={'handle ' + h} role="button" aria-label={`Resize ${h}`} onPointerDown={start(h)} onPointerMove={move} onPointerUp={end} onPointerCancel={end} />
         ))}
       </div>
-      <div className="selection-toolbar group" style={{ left: Math.max(0, Math.min(left, page.width * zoom - 240)), top: toolbarTop }} onPointerDown={(e) => e.stopPropagation()}>
+      <div ref={toolbarRef} className="selection-toolbar group" style={toolbarPos(r.x, r.y, r.height)} onPointerDown={(e) => e.stopPropagation()}>
         <button className="btn icon-btn" title="Delete" aria-label="Delete selection" onClick={deleteSelection}><IconTrash /></button>
         <button className="btn icon-btn" title="Duplicate" aria-label="Duplicate selection" onClick={duplicateSelection}><IconDuplicate /></button>
         <button className="btn icon-btn" title="Copy" aria-label="Copy selection" onClick={copySelection}><IconCopy /></button>

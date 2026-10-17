@@ -18,8 +18,28 @@ export function PageOverlayObject({ x, y, width, height, zoom, collapsible, coll
   );
 }
 
+// Shared between the text box and the selection overlay that covers it once the lasso selects it,
+// so the two clicks of a double-click count together even though they land on different elements.
+// (dblclick itself is unreliable for touch and Pencil.)
+let lastTap: { id: string; t: number } | null = null;
+export function isDoubleTap(id: string, t: number): boolean {
+  const double = lastTap !== null && lastTap.id === id && t - lastTap.t < 400;
+  lastTap = double ? null : { id, t };
+  return double;
+}
+
+/** Switch to the text tool and start editing a box. Call from a pointerdown and pass the event:
+ *  without preventDefault the browser's mousedown moves focus to <body> right after the textarea
+ *  mounts and focuses, which blurs it and immediately ends the edit. */
+export function editTextBox(id: string, e: { preventDefault(): void }) {
+  e.preventDefault();
+  const st = useEditorStore.getState();
+  if (st.tool !== 'text') st.setTool('text');
+  st.setEditingTextBox(id);
+}
+
 export function TextBoxView({ tb, zoom, tool, editing, selected, page }: { tb: TextBox; zoom: number; tool: ToolId; editing: boolean; selected: boolean; page: PageRecord }) {
-  const { updateTextBox, setEditingTextBox, commitTextBoxEdit, deleteTextBox, setSelection } = useEditorStore.getState();
+  const { updateTextBox, commitTextBoxEdit, endTextEdit, setSelection } = useEditorStore.getState();
   const taRef = useRef<HTMLTextAreaElement>(null);
   const origRef = useRef<TextBox | null>(null);
   const drag = useRef<{ kind: 'move' | 'resize'; pointerId: number; sx: number; sy: number; ox: number; oy: number; ow: number; oh: number } | null>(null);
@@ -28,43 +48,41 @@ export function TextBoxView({ tb, zoom, tool, editing, selected, page }: { tb: T
 
   useEffect(() => {
     if (editing) {
-      origRef.current = tb;
       const ta = taRef.current;
       if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
     }
   }, [editing]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Fit the box to its text, shrinking as well as growing. scrollHeight never reports less than the
+  // textarea's current height, so collapse it for the measurement.
   const autoHeight = () => {
     const ta = taRef.current; if (!ta) return;
-    const h = Math.max(tb.fontSize * 1.3 + 8, ta.scrollHeight / zoom);
-    if (Math.abs(h - tb.height) > 0.5) updateTextBox(tb.id, { height: h }, false);
-  };
-
-  const finishEdit = () => {
+    ta.style.height = '0px';
+    const box = ta.closest<HTMLElement>('.textbox');
+    const content = ta.scrollHeight + (box ? box.offsetHeight - box.clientHeight : 0); // + the box's border
+    ta.style.height = '';
     const cur = useEditorStore.getState().textBoxesByPage[tb.pageId]?.find((t) => t.id === tb.id);
     if (!cur) return;
-    if (cur.text.trim() === '') { deleteTextBox(tb.id); return; }
-    if (origRef.current) commitTextBoxEdit(origRef.current);
-    setEditingTextBox(null);
+    const h = Math.max(cur.fontSize * 1.3 + 8, content / zoom);
+    if (Math.abs(h - cur.height) > 0.5) updateTextBox(tb.id, { height: h }, false);
   };
+
 
   const onDown = (e: RPointerEvent<HTMLDivElement>) => {
     if (e.pointerType === 'touch' && useEditorStore.getState().penActive) return;
     e.stopPropagation();
     if (tool === 'lasso') {
+      if (isDoubleTap(tb.id, e.timeStamp)) { editTextBox(tb.id, e); return; }
       setSelection({ pageId: tb.pageId, strokeIds: [], textBoxIds: [tb.id], boundingRect: { x: tb.x, y: tb.y, width: tb.width, height: tb.height } });
       return;
     }
-    if (tool === 'text' && !editing) {
-      if (useEditorStore.getState().editingTextBoxId) setEditingTextBox(null);
-      setEditingTextBox(tb.id);
-    }
+    if (tool === 'text' && !editing) editTextBox(tb.id, e);
   };
 
   const startDrag = (kind: 'move' | 'resize') => (e: RPointerEvent<HTMLDivElement>) => {
     e.stopPropagation(); e.preventDefault();
     try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch { /* synthetic event */ }
-    origRef.current ??= tb;
+    origRef.current = tb;
     drag.current = { kind, pointerId: e.pointerId, sx: e.clientX, sy: e.clientY, ox: tb.x, oy: tb.y, ow: tb.width, oh: tb.height };
   };
   const moveDrag = (e: RPointerEvent<HTMLDivElement>) => {
@@ -82,7 +100,9 @@ export function TextBoxView({ tb, zoom, tool, editing, selected, page }: { tb: T
     const d = drag.current; if (!d || d.pointerId !== e.pointerId) return;
     e.stopPropagation();
     drag.current = null;
-    if (!editing && origRef.current) { commitTextBoxEdit(origRef.current); origRef.current = null; }
+    // while editing, endTextEdit records the move/resize together with the typing
+    if (!editing && origRef.current) commitTextBoxEdit(origRef.current);
+    origRef.current = null;
   };
 
   return (
@@ -95,7 +115,7 @@ export function TextBoxView({ tb, zoom, tool, editing, selected, page }: { tb: T
             value={tb.text}
             style={{ fontSize: tb.fontSize * zoom }}
             onChange={(e) => { updateTextBox(tb.id, { text: e.target.value }, false); requestAnimationFrame(autoHeight); }}
-            onBlur={finishEdit}
+            onBlur={() => endTextEdit(tb.id)}
             onKeyDown={(e) => { if (e.key === 'Escape') { e.preventDefault(); (e.target as HTMLTextAreaElement).blur(); } e.stopPropagation(); }}
             onPointerDown={(e) => e.stopPropagation()}
           />

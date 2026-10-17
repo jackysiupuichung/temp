@@ -57,7 +57,11 @@ export type EditorState = {
   deleteTextBox(id: string): void;
   /** Record an undo entry for an edit session that was applied live (non-undoable) step by step. */
   commitTextBoxEdit(original: TextBox): void;
+  /** Start editing a box (ending any other edit), or end the current edit with null. */
   setEditingTextBox(id: string | null): void;
+  /** End the current text edit: record it as one undo step, or remove the box if it was left empty.
+   *  With an id, only ends the edit if that box is the one being edited. */
+  endTextEdit(id?: string): void;
   insertBlankPageAfter(index: number): void;
   deleteBlankPage(pageId: string): void;
   setTool(tool: ToolId): void;
@@ -146,6 +150,14 @@ function selectionRect(strokes: Stroke[], boxes: TextBox[]): Rect {
   return r ?? { x: 0, y: 0, width: 0, height: 0 };
 }
 
+function findTextBox(state: EditorState, id: string): TextBox | undefined {
+  for (const arr of Object.values(state.textBoxesByPage)) { const t = arr.find((x) => x.id === id); if (t) return t; }
+  return undefined;
+}
+
+/** The box being typed into and how it looked when the edit began (null: the box was created by this edit). */
+let textEdit: { id: string; original: TextBox | null } | null = null;
+
 let toolSettingsSaveTimer: ReturnType<typeof setTimeout> | null = null;
 let openToken = 0;
 
@@ -172,6 +184,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   async openDocument(id) {
     const token = ++openToken;
+    get().endTextEdit();
     set({ loading: true, error: null, doc: null, strokesByPage: {}, textBoxesByPage: {}, selection: null, editingTextBoxId: null });
     try {
       const [doc, strokes, boxes, settings] = await Promise.all([getDocument(id), getStrokesForDoc(id), getTextBoxesForDoc(id), loadToolSettings()]);
@@ -208,6 +221,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   closeDocument() {
     openToken++;
+    get().endTextEdit();
     void persister.flush();
     set({ doc: null, strokesByPage: {}, textBoxesByPage: {}, selection: null, editingTextBoxId: null, clipboard: get().clipboard });
   },
@@ -221,6 +235,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   undo() {
+    get().endTextEdit(); // undo while typing reverts the typing
     const st = get();
     if (!st.doc) return;
     const stack = stackFor(st.doc.id);
@@ -230,6 +245,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   redo() {
+    get().endTextEdit();
     const st = get();
     if (!st.doc) return;
     const stack = stackFor(st.doc.id);
@@ -272,7 +288,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     });
   },
 
-  setSelection(sel) { set({ selection: sel, editingTextBoxId: null }); },
+  setSelection(sel) { get().endTextEdit(); set({ selection: sel }); },
 
   getSelectedItems() {
     const { selection, strokesByPage, textBoxesByPage } = get();
@@ -380,12 +396,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   addTextBox(tb) {
-    get().applyAction({
-      label: 'Add text',
-      forward: [{ kind: 'putTextBoxes', items: [tb] }],
-      backward: [{ kind: 'deleteTextBoxes', ids: [tb.id], pageIds: [tb.pageId] }],
-    });
-    set({ editingTextBoxId: tb.id, selection: null });
+    get().endTextEdit();
+    // No undo step yet: endTextEdit records "Add text" once the box has text, or drops it if it stays empty.
+    set({ ...applyOps(get(), [{ kind: 'putTextBoxes', items: [tb] }]), editingTextBoxId: tb.id, selection: null });
+    textEdit = { id: tb.id, original: null };
   },
 
   putTextBoxSilently(tb) {
@@ -415,9 +429,15 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   deleteTextBox(id) {
     const st = get();
-    let existing: TextBox | undefined;
-    for (const arr of Object.values(st.textBoxesByPage)) { existing = arr.find((t) => t.id === id); if (existing) break; }
+    let existing = findTextBox(st, id);
     if (!existing) return;
+    if (textEdit?.id === id) {
+      // undo should bring back the box as it was before this edit, or nothing if the edit created it
+      const original = textEdit.original;
+      textEdit = null;
+      if (!original) { set({ ...applyOps(st, [{ kind: 'deleteTextBoxes', ids: [id], pageIds: [existing.pageId] }]), editingTextBoxId: null, selection: null }); return; }
+      existing = original;
+    }
     st.applyAction({ label: 'Delete text', forward: [{ kind: 'deleteTextBoxes', ids: [id], pageIds: [existing.pageId] }], backward: [{ kind: 'putTextBoxes', items: [existing] }] });
     set({ editingTextBoxId: null, selection: null });
   },
@@ -430,7 +450,32 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     st.applyAction({ label: 'Edit text', forward: [{ kind: 'putTextBoxes', items: [current] }], backward: [{ kind: 'putTextBoxes', items: [original] }] });
   },
 
-  setEditingTextBox(id) { set({ editingTextBoxId: id }); },
+  setEditingTextBox(id) {
+    if (textEdit && textEdit.id === id) return;
+    get().endTextEdit();
+    if (id) textEdit = { id, original: findTextBox(get(), id) ?? null };
+    set({ editingTextBoxId: id });
+  },
+
+  endTextEdit(id) {
+    const e = textEdit;
+    if (!e || (id !== undefined && e.id !== id)) return;
+    textEdit = null;
+    if (get().editingTextBoxId === e.id) set({ editingTextBoxId: null });
+    const st = get();
+    const cur = findTextBox(st, e.id);
+    if (!cur) return;
+    if (cur.text.trim() === '') {
+      if (e.original && e.original.text.trim() !== '') {
+        st.applyAction({ label: 'Delete text', forward: [{ kind: 'deleteTextBoxes', ids: [cur.id], pageIds: [cur.pageId] }], backward: [{ kind: 'putTextBoxes', items: [e.original] }] });
+      } else {
+        set(applyOps(st, [{ kind: 'deleteTextBoxes', ids: [cur.id], pageIds: [cur.pageId] }])); // never had text: nothing to undo
+      }
+      return;
+    }
+    if (!e.original) st.applyAction({ label: 'Add text', forward: [{ kind: 'putTextBoxes', items: [cur] }], backward: [{ kind: 'deleteTextBoxes', ids: [cur.id], pageIds: [cur.pageId] }] });
+    else st.commitTextBoxEdit(e.original);
+  },
 
   insertBlankPageAfter(index) {
     const doc = get().doc;
@@ -464,7 +509,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   setTool(tool) {
-    set({ tool, editingTextBoxId: null, selection: tool === 'lasso' ? get().selection : null });
+    get().endTextEdit();
+    set({ tool, selection: tool === 'lasso' ? get().selection : null });
   },
 
   setToolSettings(patch) {

@@ -95,3 +95,77 @@ test('import → draw with pen → reload → strokes still present', async ({ p
   await expect.poll(() => strokeCount(page)).toBe(2);
   await expect(page.getByRole('button', { name: /Page 2 of 41/ })).toBeVisible(); // V-11: scroll position restored to the page we were on
 });
+
+test('a finished text box can be edited again (text tool click, lasso double-click)', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Blank notebook' }).click();
+  await page.getByRole('button', { name: /Open Untitled notebook/ }).first().click();
+  const pg = page.locator('.page[data-page-index="0"]');
+  await expect(pg).toBeVisible();
+  const box = (await pg.boundingBox())!;
+
+  await page.keyboard.press('t');
+  await page.mouse.click(box.x + 100, box.y + 100);
+  await page.keyboard.type('hello');
+  await page.keyboard.press('Escape');
+  const tb = page.locator('.textbox');
+  await expect(tb).toHaveText('hello');
+
+  // single click with the text tool reopens it
+  await tb.click();
+  await page.keyboard.type(' world');
+  await page.keyboard.press('Escape');
+  await expect(tb).toHaveText('hello world');
+
+  // double-click with the lasso switches to the text tool and edits
+  await page.keyboard.press('l');
+  await tb.dblclick();
+  await page.keyboard.type('!');
+  await page.keyboard.press('Escape');
+  await expect(tb).toHaveText('hello world!');
+});
+
+test('empty text boxes are removed however editing ends', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Blank notebook' }).click();
+  await page.getByRole('button', { name: /Open Untitled notebook/ }).first().click();
+  const pg = page.locator('.page[data-page-index="0"]');
+  await expect(pg).toBeVisible();
+  const box = (await pg.boundingBox())!;
+  const tb = page.locator('.textbox');
+  const canUndo = () => page.evaluate(() => (window as unknown as { __notebook: { store: { getState(): { canUndo: boolean } } } }).__notebook.store.getState().canUndo);
+
+  // Esc, switching tools, and clicking elsewhere on the page all drop an untouched box, with no undo step
+  await page.keyboard.press('t');
+  await page.mouse.click(box.x + 100, box.y + 100);
+  await expect(page.getByRole('textbox', { name: 'Text box' })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(tb).toHaveCount(0);
+
+  await page.mouse.click(box.x + 100, box.y + 100);
+  await expect(tb).toHaveCount(1);
+  await page.locator('[data-tool="pen"]').click();
+  await expect(tb).toHaveCount(0);
+
+  await page.keyboard.press('t');
+  await page.mouse.click(box.x + 100, box.y + 100);
+  await page.mouse.click(box.x + 100, box.y + 300); // ends the first (empty) box, starts a second one
+  await page.keyboard.press('Escape');
+  await expect(tb).toHaveCount(0);
+  expect(await canUndo()).toBe(false);
+
+  // a box that had text and was cleared is deleted; one undo brings the text back
+  await page.mouse.click(box.x + 100, box.y + 100);
+  await page.keyboard.type('keep me');
+  await page.keyboard.press('Escape');
+  await expect(tb).toHaveText('keep me');
+  await tb.click();
+  await page.keyboard.press('Meta+a');
+  await page.keyboard.press('Backspace');
+  await page.locator('[data-tool="lasso"]').click();
+  await expect(tb).toHaveCount(0);
+  await page.keyboard.press('Meta+z');
+  await expect(tb).toHaveText('keep me');
+  await page.keyboard.press('Meta+z'); // and one more removes the original "Add text"
+  await expect(tb).toHaveCount(0);
+});

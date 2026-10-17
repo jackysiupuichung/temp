@@ -213,7 +213,7 @@ export function Toolbar({ onBack, docTitle, onRename }: { onBack: () => void; do
             <button className="btn" onClick={() => { const d = useEditorStore.getState(); d.insertBlankPageAfter(d.currentPageIndex); setOpen(null); }}>Insert blank page after current</button>
             <button className="btn" onClick={() => { newConversation(); setOpen(null); }} disabled={!hasSession} title="The next Ask starts a fresh conversation about this paper">New conversation</button>
             <button className="btn" onClick={() => { setSettingsOpen(true); setOpen(null); }}>Assistant settings…</button>
-            <div className="hint" style={{ padding: '8px 10px' }}>Shortcuts: P pen · H highlighter · E eraser · L lasso · T text · A ask · Space+drag pan · ⌘Z undo · ⇧⌘Z redo · ⌘C/⌘X/⌘V copy/cut/paste</div>
+            <div className="hint" style={{ padding: '8px 10px' }}>Shortcuts: P pen · H highlighter · E eraser · L lasso · T text · A ask · Space+drag pan · ⌘Z undo · ⇧⌘Z redo · ⌘C/⌘X/⌘V copy/cut/paste · double-click a text box to edit it</div>
           </div>
         </Popover>
       </div>
