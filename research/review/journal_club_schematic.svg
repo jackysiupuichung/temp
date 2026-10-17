@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" width="1000" height="520" font-family="Helvetica, Arial, sans-serif">
   <title>Library Journal Club — the loop</title>
-  <desc>The simplest self-improving loop. You set the agenda. Twenty PhD-student agents, one per paper, each write one note. The PI scores the notes. Everything goes into an archive with its score. The next round starts by reading the best of the archive. Three rounds overnight, then you read the minutes.</desc>
+  <desc>The simplest self-improving loop. You set the agenda. Eight PhD-student agents, one per paper, each write one note. The PI scores the notes. Everything goes into an archive with its score. The next round starts by reading the best of the archive. Three rounds overnight, then you read the minutes.</desc>
   <style>
     .t { font-size: 12.5px; fill: #1f2937; }
     .ts { font-size: 11px; fill: #4b5563; }
@@ -40,7 +40,7 @@
   <!-- Students -->
   <rect x="290" y="110" width="260" height="90" rx="8" class="students"/>
   <use href="#i-docs" x="302" y="134" width="34" height="34" fill="#ffffff" stroke="#6c8ebf"/>
-  <text x="348" y="140" class="tb">20 PhD students</text>
+  <text x="348" y="140" class="tb">8 PhD students</text>
   <text x="348" y="157" class="ts">one per paper in your library</text>
   <text x="348" y="171" class="ts">each writes one note per round:</text>
   <text x="348" y="185" class="ts">a claim, a critique, or an idea</text>
@@ -68,7 +68,7 @@
   <!-- 1 students -> PI -->
   <path d="M550 155H700" class="edge" marker-end="url(#ah)"/>
   <circle cx="625" cy="155" r="10" class="num"/><text x="625" y="159" class="numt" text-anchor="middle">1</text>
-  <text x="625" y="140" class="t" text-anchor="middle">20 notes</text>
+  <text x="625" y="140" class="t" text-anchor="middle">8 notes</text>
 
   <!-- 2 PI -> archive -->
   <path d="M830 200V375H755" class="edge" marker-end="url(#ah)"/>
@@ -79,7 +79,7 @@
   <path d="M495 375H420V200" class="edge" marker-end="url(#ah)"/>
   <circle cx="420" cy="290" r="10" class="num"/><text x="420" y="294" class="numt" text-anchor="middle">3</text>
   <text x="404" y="294" class="t" text-anchor="end">next round: each student reads</text>
-  <text x="404" y="309" class="t" text-anchor="end">the 5 best notes + the weak-spot line</text>
+  <text x="404" y="309" class="t" text-anchor="end">the 4 best notes + the weak-spot line</text>
 
   <!-- 4 archive -> you -->
   <path d="M625 420V460H115V280" class="edge" marker-end="url(#ah)"/>
@@ -88,5 +88,5 @@
 
   <!-- loop label -->
   <text x="625" y="262" class="tb" text-anchor="middle">× 3 rounds</text>
-  <text x="625" y="279" class="ts" text-anchor="middle">~25 calls per round, ~80 for the night</text>
+  <text x="625" y="279" class="ts" text-anchor="middle">~12 calls per round, ~40 for the night</text>
 </svg>
