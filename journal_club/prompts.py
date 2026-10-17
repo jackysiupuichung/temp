@@ -13,9 +13,9 @@ if TYPE_CHECKING:
     from journal_club.rounds.directions import Direction
     from journal_club.rounds.map_round import PairVerdict
 
-KINDS = ("ingest", "map", "debate_turn", "debate_verdict", "directions", "baseline", "judge")
+KINDS = ("ingest", "map", "debate_turn", "debate_verdict", "directions", "baseline", "judge", "synthesis")
 # Kinds whose input carries QUOTE[...] lines and whose output copies them; the others never see or emit quotes.
-QUOTE_KINDS = ("map", "debate_turn", "directions", "baseline")
+QUOTE_KINDS = ("map", "debate_turn", "directions", "baseline", "synthesis")
 PROMPT_DIR = Path(__file__).parent / "prompts"
 
 
@@ -89,6 +89,20 @@ SCHEMAS: dict[str, dict] = {
     ),
     "directions": _obj({"directions": _arr(_DIRECTION)}),
     "baseline": _obj({"directions": _arr(_DIRECTION)}),
+    "synthesis": _obj(
+        {
+            "overview": _S,
+            "key_points": _arr(
+                _obj(
+                    {
+                        "kind": {"type": "string", "enum": ["consensus", "dissent", "gap", "direction"]},
+                        "text": _S,
+                        "quotes": _arr(Q),
+                    }
+                )
+            ),
+        }
+    ),
     "judge": _obj(
         {
             "verdict": {"type": "string", "enum": ["hit", "partial", "miss"]},
@@ -223,4 +237,42 @@ def build_judge(direction: Direction, after_cards: list[PaperCard]) -> str:
     body: list[str] = []
     for c in after_cards:
         body += ["", f"AFTER_PAPER: {c.id}", render_card_for_prompt(c)]
+    return "\n".join(head + body)
+
+
+def build_synthesis(
+    agenda: str,
+    cards: list[PaperCard],
+    agree_pairs: list[PairVerdict],
+    shared_pairs: list[PairVerdict],
+    disputes: list[Dispute],
+    directions: list[Direction],
+) -> str:
+    """AGENDA, all cards, then CONSENSUS, SHARED_LIMITATIONS, DISPUTES and DIRECTIONS blocks with their quotes."""
+    head = _headers([("AGENDA", agenda)])
+    body = _cards_block(cards)
+    for title, pairs in (("CONSENSUS", agree_pairs), ("SHARED_LIMITATIONS", shared_pairs)):
+        body += ["", f"{title}:"]
+        if pairs:
+            for p in pairs:
+                body.append(f"- {p.a} and {p.b}: {_line(p.note)}")
+                body += _quote_lines([p.quote_a, p.quote_b])
+        else:
+            body.append("(none)")
+    body += ["", "DISPUTES:"]
+    if disputes:
+        for d in disputes:
+            body.append(f"- {d.a} vs {d.b} [{d.verdict}]: {_line(d.claim)}")
+            body.append(f"  reason: {_line(d.judge_reason)}")
+            for t in d.turns:
+                body += _quote_lines(t.quotes)
+    else:
+        body.append("(none)")
+    body += ["", "DIRECTIONS:"]
+    if directions:
+        for i, d in enumerate(directions, start=1):
+            body.append(f"{i}. ({d.confidence:.2f}) {_line(d.text)}")
+            body += _quote_lines(d.quotes)
+    else:
+        body.append("(none)")
     return "\n".join(head + body)

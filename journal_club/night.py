@@ -14,10 +14,11 @@ from journal_club.llm import LLM, MockLLM, resolve_model
 from journal_club.rounds.debate import Dispute, disputes_from_events, run_debate
 from journal_club.rounds.directions import Direction, directions_from_events, run_directions
 from journal_club.rounds.map_round import MapResult, card_content_sha, card_ids_sha, run_map
+from journal_club.rounds.synthesis import Synthesis, run_synthesis, synthesis_from_events
 
 log = logging.getLogger(__name__)
 
-STEPS: tuple[Step, ...] = ("map", "debate", "directions")
+STEPS: tuple[Step, ...] = ("map", "debate", "directions", "synthesis")
 SKIP_REASON = "resumed from archive"
 
 
@@ -33,6 +34,7 @@ class NightResult(BaseModel):
     map: MapResult
     disputes: list[Dispute]
     directions: list[Direction]
+    synthesis: Synthesis | None = None
 
 
 # ---------------------------------------------------------------- helpers
@@ -170,7 +172,14 @@ def run_night(
         lambda: run_directions(map_result, disputes, cards, llm, archive, n=n, agenda=agenda, round=round),
         len,
     )
-    log.info(
-        "night: %d pairs, %d dispute(s), %d direction(s)", len(map_result.pairs), len(disputes), len(directions)
+    synthesis = _resume_or_run(
+        archive, "synthesis", sha, round,
+        lambda: synthesis_from_events(archive),
+        lambda: run_synthesis(map_result, disputes, directions, cards, llm, archive, agenda=agenda, round=round),
+        lambda s: len(s.key_points) if s is not None else 0,
     )
-    return NightResult(map=map_result, disputes=disputes, directions=directions)
+    log.info(
+        "night: %d pairs, %d dispute(s), %d direction(s), %d key point(s)",
+        len(map_result.pairs), len(disputes), len(directions), len(synthesis.key_points) if synthesis else 0,
+    )
+    return NightResult(map=map_result, disputes=disputes, directions=directions, synthesis=synthesis)

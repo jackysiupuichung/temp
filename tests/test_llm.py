@@ -60,7 +60,15 @@ def all_user_prompts(cards: list[PaperCard]) -> dict[str, str]:
         "directions": prompts.build_directions("agenda", 8, before, [_dispute(a, b)], [_shared(cards[4], cards[5])]),
         "baseline": prompts.build_baseline("agenda", 10, before),
         "judge": prompts.build_judge(_direction(), after),
+        "synthesis": prompts.build_synthesis(
+            "agenda", before, [_agree(cards[1], cards[2])], [_shared(cards[4], cards[5])], [_dispute(a, b)], []
+        ),
     }
+
+
+def _agree(a: PaperCard, b: PaperCard) -> SimpleNamespace:
+    """Stand-in for an agreeing PairVerdict."""
+    return SimpleNamespace(a=a.id, b=b.id, relation="agree", quote_a=a.claims[0].quote, quote_b=b.claims[0].quote, note="same finding")
 
 
 # ------------------------------------------------------------------- mock
