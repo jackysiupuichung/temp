@@ -1,100 +1,56 @@
-# The Library Journal Club as one lab
+# The Library Journal Club: the loop
 
-![Organisation schematic](journal_club_schematic.svg)
+![The loop](journal_club_schematic.svg)
 
-*Schematic source: [journal_club_schematic.svg](journal_club_schematic.svg). Editable in any text editor or by importing into draw.io.*
+*Source: [journal_club_schematic.svg](journal_club_schematic.svg). Editable in a text editor or by importing into draw.io.*
 
-Think of it as a lab meeting. You are the scientist who owns the library. A PI agent runs the meeting, a senior postdoc agent is the tough reviewer, a lab manager agent keeps the minutes, and every paper in your Zotero library is a PhD student who knows that one paper inside out. The meeting format is Virtual Lab's team meeting; the scoring rubric and the archive are ASCollab's; the dispute step is ours.
+The simplest self-improving architecture is a loop with an archive. That is what every system in [rsi.md](rsi.md) that keeps improving has in common (Darwin Gödel Machine, AlphaEvolve, AI co-scientist): generate, score, keep everything, and let the next round start from the best of what was kept.
 
-## Who is in the lab
+## Four parts
 
-| Role | Who | Does | Borrowed from |
-| --- | --- | --- | --- |
-| You | The human | Set the agenda question once; read the minutes in the morning; settle what the PI marks `unresolved` | Virtual Lab (human writes ~1% of words) |
-| PI | One agent, strongest model | Opens the meeting, sets the questions, sums up each round, rules on disputes, must "choose one" | Virtual Lab PI |
-| Senior postdoc | One agent, standing | Speaks last every round; checks rigour and that every quote exists in the source; gives feedback, never writes the answer | Virtual Lab Scientific Critic |
-| Lab manager | One agent, cheap model | Writes the structured minutes and the Zotero notes; never argues | Virtual Lab summary format |
-| PhD students | 20 agents, one per paper | Each knows one paper: its claim, methods, data, limits | Paper agent (Paper2Agent) |
-| ↳ Presenting student | One per turn | Presents their paper: claim, evidence, limits | |
-| ↳ Two discussing students | The two with the closest topics | Discuss and score Support, Soundness, Significance, Originality 1-4 | ASCollab K=2 review |
-| ↳ Rest of the lab | The other 17 | May say "pass", or disagree and name the paper | Virtual Lab team prompt |
+| Part | Who | Does |
+| --- | --- | --- |
+| You | The human | Set the agenda at 10 pm. Read the minutes at 8 am. |
+| 20 PhD students | One agent per paper in your library | Each writes one note per round: a claim, a critique of another paper, or an idea. |
+| PI | One agent | Scores every note 1-5, checks that the quotes exist in the source, writes one line on what was weak this round. |
+| Archive | One file, `events.jsonl` | Every note with its score. Never deleted. The minutes and the Zotero notes are read from it. |
 
-Every agent is four fields: title, expertise, goal, role (Virtual Lab). A student is "discussing" only for that turn; it is a second system prompt, not a different agent.
-
-## One lab meeting
-
-```mermaid
-sequenceDiagram
-    accTitle: One lab meeting
-    accDescr: You give the agenda question. The PI opens and sets the questions. For each item the presenting student speaks, two discussing students score, the rest of the lab may pass or disagree, the postdoc checks, and the PI sums up, for two or three rounds. The PI's summary goes to the lab manager, who writes the event log, Zotero notes and minutes.
-
-    participant Y as You
-    participant PI as PI
-    participant P as Presenting student
-    participant D as Discussing students x2
-    participant L as Rest of the lab
-    participant X as Senior postdoc
-    participant M as Lab manager
-
-    Y->>PI: agenda question (meeting 1 only)
-    PI->>P: opens, sets the questions
-    loop 2-3 rounds per item
-        P->>D: claim, evidence, limits
-        D->>PI: critique, scores 1-4 x4
-        L-->>PI: pass, or disagree and name the paper
-        X->>PI: do the quotes exist? what is weak?
-        PI->>PI: sums up, chooses one
-    end
-    PI->>M: structured summary (Agenda / Input / Recommendation / Next)
-    M->>M: events.jsonl, Zotero notes
-    M-->>Y: minutes
-```
-
-House rules that keep it short:
-
-- One shared transcript; each turn swaps the system prompt (Virtual Lab `run_meeting`). At most 5 students speak per item; the rest listen.
-- Only the PI's summary leaves the meeting; the transcript stays in the lab.
-- Disputes: when two students' papers clash, each defends with quotes for 2 turns; the PI rules `stands`, `contested` or `unresolved`. `unresolved` goes to you.
-- The PI must choose one answer per question (agents hedge unless forced).
-
-## Three meetings overnight
+## One round
 
 ```mermaid
 flowchart LR
-    accTitle: Three lab meetings overnight
-    accDescr: Meeting one is introductions, where every student presents their paper. Meeting two is the journal club debate on the conflicts the PI listed. Meeting three is the brainstorm, where the PI pairs students and the final minutes are written.
+    accTitle: One round of the loop
+    accDescr: Students read the five best notes and the PI's weak-spot line from the archive, each writes one note, the PI scores them, and everything is appended to the archive. The archive feeds the next round.
 
-    agenda["🧑‍🔬 You set the agenda<br/>10 pm"]
-    m1["🔵 Meeting 1: Introductions<br/>every student presents their paper<br/>PI lists the conflicts"]
-    m2["🟠 Meeting 2: Journal club debate<br/>students in conflict argue, 2 turns<br/>stands / contested / unresolved"]
-    m3["🟢 Meeting 3: Brainstorm<br/>PI pairs students, one idea per pair<br/>final minutes"]
-    morning["☀️ Morning<br/>minutes, Zotero notes,<br/>unresolved items for you"]
+    archive[("📚 Archive<br/>every note + score")]
+    students["🎓 20 students<br/>one note each"]
+    pi["🪑 PI<br/>scores 1–5, checks quotes,<br/>one weak-spot line"]
 
-    agenda --> m1
-    m1 -- "claim per paper, conflict list" --> m2
-    m2 -- "verdicts" --> m3
-    m3 --> morning
+    archive -- "5 best notes + weak-spot line" --> students
+    students -- "20 notes" --> pi
+    pi -- "notes + scores" --> archive
 
-    classDef one fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
-    classDef two fill:#ffedd5,stroke:#ea580c,stroke-width:2px,color:#7c2d12
-    classDef three fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
-    classDef person fill:#fef9c3,stroke:#ca8a04,stroke-width:2px,color:#713f12
-
-    class m1 one
-    class m2 two
-    class m3 three
-    class agenda,morning person
+    classDef store fill:#fff2cc,stroke:#d6b656,color:#1f2937
+    classDef agents fill:#dae8fc,stroke:#6c8ebf,color:#1f2937
+    classDef chair fill:#f8cecc,stroke:#b85450,color:#1f2937
+    class archive store
+    class students agents
+    class pi chair
 ```
 
-| | Meeting 1: Introductions | Meeting 2: Journal club debate | Meeting 3: Brainstorm |
-| --- | --- | --- | --- |
-| Who speaks | Every student once, 2 discussants each | Only the students in conflict | One pair at a time, ~4 pairs |
-| PI decides | The conflict list | Verdicts, cap 5 disputes | Which ideas to keep |
-| Postdoc checks | Quotes exist | Whose evidence holds | Feasibility |
-| Lab manager writes | Claim per paper, first Zotero notes | Verdict per dispute, red edges | Ideas, green edges, final minutes |
+Three rounds overnight. Round 1 has an empty archive, so the students write from their paper and the agenda alone. Rounds 2 and 3 start from the archive.
 
-Budget: meeting 1 ≈ 20 × (presenter + 2 discussants + postdoc + PI) ≈ 100 calls; meeting 2 ≈ 5 disputes × 6 ≈ 30; meeting 3 ≈ 4 pairs × 6 ≈ 25; lab manager ≈ 15. **About 170 calls for the night.**
+## What this loop gives you for free
 
-## Why one lab
+- **Disputes**: a critique note that scores high *is* a dispute; the PI's score is the verdict.
+- **Collaborations**: an idea note names two papers; that is the green edge.
+- **Minutes**: the top-scored notes of the night, grouped by type.
+- **Zotero**: each paper's notes, written back after round 3.
 
-Twenty papers is the size of one reading group, and the review in [organisation_structure.md](organisation_structure.md) favours a chair who sums up and summaries that travel instead of transcripts (Virtual Lab, MetaGPT, ChatDev, MacNet). Splitting into topic groups adds a layer of leads and summaries that only pays off above ~16 active participants per meeting (MacNet's saturation point); with 5 students speaking per item there is no need. ASCollab's flat society is kept only in the rubric and the archive; its missing dispute step is meeting 2.
+## Cost
+
+About 25 calls per round (20 notes, 1 batched scoring call per 5 notes, 1 weak-spot line), ~80 for the night.
+
+## Why it is enough
+
+The review found that compounding needs three things: an archive that never discards, a selection rule, and a scorer ([rsi.md](rsi.md) §b). This loop has all three and nothing else. Everything in the earlier versions (groups, leads, discussants, debate turns, meta-review tournaments) is a refinement that can be added once this runs.

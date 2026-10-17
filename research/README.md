@@ -6,7 +6,7 @@ Literature review and key papers for the hackathon idea: every paper in a Zotero
 Read in this order:
 
 1. [synthesis.md](review/synthesis.md) — what to borrow, corrections to the pitch doc, revised round, caps, interfaces, build order.
-2. [organisation_diagram.md](review/organisation_diagram.md) — the design as one lab: you, a PI, a senior postdoc, a lab manager, and one PhD student per paper; schematic, one meeting, three overnight meetings.
+2. [organisation_diagram.md](review/organisation_diagram.md) — the design as one loop: you, 20 PhD students (one per paper), a PI that scores, an archive that never deletes; three rounds overnight.
 3. [ascollab.md](review/ascollab.md) — anchor 1: "Hypothesis Hunting with Evolving Networks of Autonomous Scientific Agents" (Liu et al., Cambridge, arXiv 2510.08619). Flat society, registry + archive, K=2 blind review, tournament meta-review. No dispute mechanism.
 4. [virtual_lab.md](review/virtual_lab.md) — anchor 2: The Virtual Lab (Swanson ... Zou, Nature 2025; bioRxiv, not arXiv). Four-field agents, PI + standing Critic, team/individual meetings, parallel-and-merge, structured summaries.
 5. [organisation_structure.md](review/organisation_structure.md) — 30 papers on topology, roles, review, archives, disputes, human steering.
