@@ -7,6 +7,8 @@ import { inputState } from './inputState';
 import { releasePdf } from '../pdf/pdf';
 import { persister } from '../persist/persist';
 import type { ToolId } from '../model/types';
+import { useAgentStore } from '../agent/client';
+import { ask } from '../agent/ask';
 
 export function Editor({ docId, onBack }: { docId: string; onBack: () => void }) {
   const doc = useEditorStore((s) => s.doc);
@@ -49,6 +51,7 @@ export function Editor({ docId, onBack }: { docId: string; onBack: () => void })
       if (mod) return;
       if (e.key === 'Escape') { st.setSelection(null); st.setEditingTextBox(null); return; }
       if ((e.key === 'Delete' || e.key === 'Backspace') && st.selection) { e.preventDefault(); st.deleteSelection(); return; }
+      if (e.key.toLowerCase() === 'a') { e.preventDefault(); void ask().catch(() => {}); return; }
       const map: Record<string, ToolId> = { p: 'pen', h: 'highlighter', e: 'eraser', l: 'lasso', t: 'text', v: 'hand' };
       const t = map[e.key.toLowerCase()];
       if (t) { st.setTool(t); }
@@ -62,6 +65,9 @@ export function Editor({ docId, onBack }: { docId: string; onBack: () => void })
 
   // Autosave on hide (S-1) is handled by the persister; also flush when leaving the editor.
   useEffect(() => () => { void persister.flush(); }, []);
+
+  // Agent server pairing settings (agent design §2).
+  useEffect(() => { void useAgentStore.getState().loadSettings(); }, []);
 
   if (error) return <div className="loading">Could not open document: {error} <button className="btn" onClick={onBack}>Back</button></div>;
   if (loading || !doc) return <div className="loading">Opening…</div>;

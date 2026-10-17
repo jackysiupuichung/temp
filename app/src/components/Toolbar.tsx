@@ -4,12 +4,15 @@ import { HIGHLIGHTER_WIDTHS, HIGHLIGHT_COLORS, PEN_WIDTHS, PRESET_COLORS, ZOOM_M
 import { Popover } from './Popover';
 import {
   IconBack, IconPen, IconHighlighter, IconEraser, IconLasso, IconText, IconHand, IconUndo, IconRedo, IconPages, IconExport, IconMore,
-  IconPlus, IconMinus, IconFitWidth, IconFitPage, IconPaste, IconFinger,
+  IconPlus, IconMinus, IconFitWidth, IconFitPage, IconPaste, IconFinger, IconSpark,
 } from './icons';
 import { exportAnnotatedPdf } from '../export/pdfExport';
 import { exportBundle } from '../export/bundle';
 import { renderPageImage } from '../api/notebookApi';
 import { downloadBlob, safeFilename } from '../export/download';
+import { ask, cancelAsk, newConversation, retryAsk } from '../agent/ask';
+import { useAgentStore } from '../agent/client';
+import { AgentSettingsModal } from './AgentSettings';
 
 const TOOLS: { id: ToolId; label: string; key: string; icon: ReactNode }[] = [
   { id: 'pen', label: 'Pen', key: 'P', icon: <IconPen /> },
@@ -62,6 +65,11 @@ export function Toolbar({ onBack, docTitle, onRename }: { onBack: () => void; do
   const setFingerDraws = useEditorStore((s) => s.setFingerDraws);
   const clipboard = useEditorStore((s) => s.clipboard);
   const paste = useEditorStore((s) => s.paste);
+  const indicator = useAgentStore((s) => s.indicator);
+  const agentStatus = useAgentStore((s) => s.status);
+  const settingsOpen = useAgentStore((s) => s.settingsOpen);
+  const setSettingsOpen = useAgentStore((s) => s.setSettingsOpen);
+  const hasSession = useEditorStore((s) => !!s.doc?.agentSessionId);
   const [open, setOpen] = useState<null | 'tool' | 'zoom' | 'export' | 'more' | 'page'>(null);
   const [pageInput, setPageInput] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
@@ -147,6 +155,21 @@ export function Toolbar({ onBack, docTitle, onRename }: { onBack: () => void; do
         <button className="btn icon-btn" onClick={redo} disabled={!canRedo} aria-label="Redo" title="Redo (⇧⌘Z)"><IconRedo /></button>
         {clipboard && <button className="btn icon-btn" onClick={() => { const d = useEditorStore.getState().doc; if (d) paste(d.pages[currentPageIndex].id); }} aria-label="Paste" title="Paste (⌘V)"><IconPaste /></button>}
       </div>
+      <div className="divider" />
+      <div className="group ask-group">
+        <button className="btn ask-btn" onClick={() => void ask().catch(() => {})} disabled={!!indicator && !indicator.error} aria-label="Ask" title="Ask about what is on screen (A)" data-testid="ask-btn">
+          <IconSpark />
+          <span className="label">Ask</span>
+        </button>
+        {indicator && (
+          <div className={'ask-indicator' + (indicator.error ? ' error' : '')} role="status" data-testid="ask-indicator">
+            {indicator.error ? <span>{indicator.error}</span> : <span><span className="spinner" aria-hidden="true" /> {indicator.text}</span>}
+            {indicator.error && indicator.canRetry && <button className="btn mini" onClick={() => void retryAsk(indicator.askId)}>Retry</button>}
+            {indicator.error && agentStatus !== 'connected' && <button className="btn mini" onClick={() => setSettingsOpen(true)}>Settings</button>}
+            <button className="btn mini" aria-label="Cancel" onClick={() => cancelAsk(indicator.askId)}>×</button>
+          </div>
+        )}
+      </div>
       <div className="spacer" />
       <div className="group">
         <button className="btn page-indicator" data-popover-anchor aria-label={`Page ${currentPageIndex + 1} of ${pageCount}. Jump to page`} title="Jump to page" onClick={() => { setPageInput(String(currentPageIndex + 1)); toggle('page'); }}>
@@ -188,11 +211,14 @@ export function Toolbar({ onBack, docTitle, onRename }: { onBack: () => void; do
         <Popover open={open === 'more'} onClose={() => setOpen(null)} align="right">
           <div className="menu">
             <button className="btn" onClick={() => { const d = useEditorStore.getState(); d.insertBlankPageAfter(d.currentPageIndex); setOpen(null); }}>Insert blank page after current</button>
-            <div className="hint" style={{ padding: '8px 10px' }}>Shortcuts: P pen · H highlighter · E eraser · L lasso · T text · Space+drag pan · ⌘Z undo · ⇧⌘Z redo · ⌘C/⌘X/⌘V copy/cut/paste</div>
+            <button className="btn" onClick={() => { newConversation(); setOpen(null); }} disabled={!hasSession} title="The next Ask starts a fresh conversation about this paper">New conversation</button>
+            <button className="btn" onClick={() => { setSettingsOpen(true); setOpen(null); }}>Assistant settings…</button>
+            <div className="hint" style={{ padding: '8px 10px' }}>Shortcuts: P pen · H highlighter · E eraser · L lasso · T text · A ask · Space+drag pan · ⌘Z undo · ⇧⌘Z redo · ⌘C/⌘X/⌘V copy/cut/paste</div>
           </div>
         </Popover>
       </div>
       {busy && <div className="toast">{busy}</div>}
+      {settingsOpen && <AgentSettingsModal onClose={() => setSettingsOpen(false)} />}
     </div>
   );
 }

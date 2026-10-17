@@ -249,6 +249,8 @@ Copy/cut keep the items and their bounding rect in the store's clipboard; paste 
 
 `PageOverlayObject` (in `TextBoxView.tsx`) is the generic page-anchored, zoom-following, optionally collapsible container that text boxes already use and that answer cards can reuse (X-4). The same object is exposed as `window.__notebook` for tests and debugging.
 
+The planned assistant built on these hooks is described in [`pdf-notebook-agent-design.md`](./pdf-notebook-agent-design.md).
+
 ---
 
 ## 12. Testing

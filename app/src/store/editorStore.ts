@@ -49,6 +49,10 @@ export type EditorState = {
   paste(pageId: string, at?: { x: number; y: number }): void;
   commitSelectionTransform(dx: number, dy: number, sx: number, sy: number, origin: { x: number; y: number }): void;
   addTextBox(tb: TextBox): void;
+  /** Put a text box without an undo entry (answer cards while streaming; see recordTextBox). */
+  putTextBoxSilently(tb: TextBox): void;
+  /** Record the creation of an existing text box as one undo step (used when an answer card finishes). */
+  recordTextBox(id: string, label: string): void;
   updateTextBox(id: string, patch: Partial<TextBox>, undoable: boolean): void;
   deleteTextBox(id: string): void;
   /** Record an undo entry for an edit session that was applied live (non-undoable) step by step. */
@@ -67,6 +71,8 @@ export type EditorState = {
   saveViewState(vs: ViewState): void;
   setPenActive(v: boolean): void;
   renameDoc(title: string): void;
+  setAgentSession(sessionId: string | null): void;
+  setPdfSha256(sha: string): void;
   getSelectedItems(): { strokes: Stroke[]; textBoxes: TextBox[] };
 };
 
@@ -174,7 +180,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const strokesByPage: Record<string, Stroke[]> = {};
       for (const s of strokes.sort((a, b) => a.createdAt - b.createdAt)) (strokesByPage[s.pageId] ??= []).push(s);
       const textBoxesByPage: Record<string, TextBox[]> = {};
-      for (const t of boxes) (textBoxesByPage[t.pageId] ??= []).push(t);
+      for (const t of boxes) {
+        // An answer card still streaming when the page was closed can't resume: show it as interrupted, with Retry.
+        const tb = t.kind === 'answer' && t.answer?.status === 'answering' ? { ...t, answer: { ...t.answer, status: 'error' as const, error: 'Interrupted' } } : t;
+        (textBoxesByPage[tb.pageId] ??= []).push(tb);
+      }
       const stack = stackFor(id);
       const opened = { ...doc, lastOpenedAt: Date.now() };
       persister.document(opened);
@@ -378,6 +388,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set({ editingTextBoxId: tb.id, selection: null });
   },
 
+  putTextBoxSilently(tb) {
+    set(applyOps(get(), [{ kind: 'putTextBoxes', items: [tb] }]));
+  },
+
+  recordTextBox(id, label) {
+    const st = get();
+    let existing: TextBox | undefined;
+    for (const arr of Object.values(st.textBoxesByPage)) { existing = arr.find((t) => t.id === id); if (existing) break; }
+    if (!existing) return;
+    st.applyAction({ label, forward: [{ kind: 'putTextBoxes', items: [existing] }], backward: [{ kind: 'deleteTextBoxes', ids: [id], pageIds: [existing.pageId] }] });
+  },
+
   updateTextBox(id, patch, undoable) {
     const st = get();
     let existing: TextBox | undefined;
@@ -466,6 +488,20 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     persister.document(next);
   },
   setPenActive(v) { if (get().penActive !== v) set({ penActive: v }); },
+  setAgentSession(sessionId) {
+    const doc = get().doc;
+    if (!doc || doc.agentSessionId === sessionId) return;
+    const next = { ...doc, agentSessionId: sessionId };
+    set({ doc: next });
+    persister.document(next);
+  },
+  setPdfSha256(sha) {
+    const doc = get().doc;
+    if (!doc || doc.pdfSha256 === sha) return;
+    const next = { ...doc, pdfSha256: sha };
+    set({ doc: next });
+    persister.document(next);
+  },
   renameDoc(title) {
     const doc = get().doc;
     if (!doc) return;

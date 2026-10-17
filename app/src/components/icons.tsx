@@ -26,3 +26,4 @@ export const IconChevron = (p: SVGProps<SVGSVGElement>) => <svg {...base(p)}><pa
 export const IconFinger = (p: SVGProps<SVGSVGElement>) => <svg {...base(p)}><path d="M10 11V4.5a1.5 1.5 0 0 1 3 0V12" /><path d="M13 11a1.5 1.5 0 0 1 3 0v1" /><path d="M16 12a1.5 1.5 0 0 1 3 0v3a6 6 0 0 1-6 6h-1a6 6 0 0 1-4.8-2.4L5 15a1.5 1.5 0 0 1 2.4-1.8L10 15" /></svg>;
 export const IconClose = (p: SVGProps<SVGSVGElement>) => <svg {...base(p)}><path d="M6 6l12 12M18 6L6 18" /></svg>;
 export const IconCheck = (p: SVGProps<SVGSVGElement>) => <svg {...base(p)}><path d="M5 12l5 5L20 7" /></svg>;
+export const IconSpark = (p: SVGProps<SVGSVGElement>) => <svg {...base(p)}><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" /><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z" /></svg>;

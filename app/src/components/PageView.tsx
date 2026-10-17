@@ -8,6 +8,7 @@ import type { PageLayout } from '../geometry/transform';
 import { usePageInput, type EraseState } from './usePageInput';
 import { SelectionOverlay } from './SelectionOverlay';
 import { TextBoxView } from './TextBoxView';
+import { AnswerCardView } from './AnswerCardView';
 import { IconPlus, IconTrash } from './icons';
 
 const EMPTY_STROKES: Stroke[] = [];
@@ -124,8 +125,13 @@ export const PageView = memo(function PageView({ page, index, total, layout, zoo
       <canvas ref={inkRef} className="ink" aria-hidden="true" />
       {selection && <SelectionOverlay page={page} zoom={zoom} bitmapScale={bitmapScale} selection={selection} strokes={strokes} textBoxes={textBoxes} />}
       <div className={'objects layer' + (objectsInert ? ' inert' : '')}>
-        {textBoxes.map((tb) => (
+        {textBoxes.filter((tb) => tb.kind !== 'answer').map((tb) => (
           <TextBoxView key={tb.id} tb={tb} zoom={zoom} tool={tool} editing={editingTextBoxId === tb.id} selected={!!selection?.textBoxIds.includes(tb.id)} page={page} />
+        ))}
+      </div>
+      <div className="answers layer">
+        {textBoxes.filter((tb) => tb.kind === 'answer' && tb.answer).map((tb) => (
+          <AnswerCardView key={tb.id} tb={tb} zoom={zoom} selected={!!selection?.textBoxIds.includes(tb.id)} page={page} />
         ))}
       </div>
       <canvas ref={liveRef} className="live" aria-hidden="true" style={{ pointerEvents: 'none' }} />

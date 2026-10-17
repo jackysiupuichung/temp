@@ -1,5 +1,6 @@
 import { getStroke } from 'perfect-freehand';
 import type { Stroke, StrokePoint, TextBox } from '../model/types';
+import { markdownToPlainText } from '../agent/markdown';
 
 export type LiveStroke = { tool: 'pen' | 'highlighter'; color: string; opacity: number; baseWidth: number; points: StrokePoint[] };
 
@@ -112,11 +113,16 @@ export function drawPenStrokes(ctx: CanvasRenderingContext2D, strokes: Stroke[])
 export function drawTextBoxes(ctx: CanvasRenderingContext2D, boxes: TextBox[]) {
   for (const t of boxes) {
     ctx.save();
+    if (t.kind === 'answer') {
+      // Answer cards export as a light panel with the Markdown source as plain text (maths kept as LaTeX source).
+      ctx.fillStyle = '#f8fafc'; ctx.fillRect(t.x, t.y, t.width, t.height);
+      ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 0.5; ctx.strokeRect(t.x, t.y, t.width, t.height);
+    }
     ctx.fillStyle = t.color;
     ctx.globalAlpha = 1;
     ctx.font = `${t.fontSize}px -apple-system, Helvetica, Arial, sans-serif`;
     ctx.textBaseline = 'top';
-    const lines = wrapText(ctx, t.text, t.width - 8);
+    const lines = wrapText(ctx, t.format === 'markdown' ? markdownToPlainText(t.text) : t.text, t.width - 8);
     const lh = t.fontSize * 1.3;
     lines.forEach((line, i) => ctx.fillText(line, t.x + 4, t.y + 4 + i * lh));
     ctx.restore();

@@ -89,6 +89,15 @@ export function getDocumentState(): { doc: DocumentRecord | null; strokesByPage:
   return { doc: s.doc, strokesByPage: s.strokesByPage, textBoxesByPage: s.textBoxesByPage, zoom: s.zoom, currentPageIndex: s.currentPageIndex };
 }
 
-export const notebookApi = { renderPageImage, renderRegionImage, getPageText, getOriginalPdfBytes, getSelection, subscribeSelection, getDocumentState, store: useEditorStore, library: useLibraryStore };
+import { askApi } from '../agent/ask';
+import { useAgentStore, client as agentClient } from '../agent/client';
+import { captureViewport } from '../agent/capture';
+
+export const notebookApi = {
+  renderPageImage, renderRegionImage, getPageText, getOriginalPdfBytes, getSelection, subscribeSelection, getDocumentState,
+  store: useEditorStore, library: useLibraryStore,
+  /** Ask (agent design): the same entry points the toolbar uses, plus the capture for the debug view. */
+  ask: askApi, agent: useAgentStore, agentClient, captureViewport,
+};
 declare global { interface Window { __notebook: typeof notebookApi } }
 if (typeof window !== 'undefined') window.__notebook = notebookApi;

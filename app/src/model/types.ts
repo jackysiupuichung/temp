@@ -12,6 +12,10 @@ export type DocumentRecord = {
   pdfBlobId: string | null; // null for blank notebooks
   pages: PageRecord[]; // display order
   viewState?: ViewState;
+  /** Agent SDK session for this document's Ask conversation (agent design §5.1). Cleared by "New conversation". */
+  agentSessionId?: string | null;
+  /** Content hash of the PDF bytes, computed once and used to sync the paper to the agent server. */
+  pdfSha256?: string;
 };
 
 export type PageRecord = {
@@ -47,6 +51,32 @@ export type TextBox = {
   text: string;
   fontSize: number;
   color: string;
+  /** 'answer' cards come from Ask (agent design §6.1); existing records have no kind and mean 'text'. */
+  kind?: 'text' | 'answer';
+  format?: 'plain' | 'markdown';
+  answer?: AnswerMeta;
+};
+
+/** What an answer card remembers about the Ask that produced it. */
+export type AnswerMeta = {
+  askId: string;
+  description: ScreenDescription; // what the vision step read, kept for edit-and-re-ask
+  status: 'answering' | 'done' | 'error';
+  error?: string;
+  anchorRect: Rect; // the handwriting the card is attached to
+  collapsed: boolean;
+  /** Largest height the card may grow to in place before its body scrolls (set by placement). */
+  maxHeight: number;
+  floating?: boolean; // placed over dense text: drawn opaque with a shadow
+  costUsd?: number;
+};
+
+/** Output of the vision interpreter (agent design §4.3). */
+export type ScreenDescription = {
+  location: { pages: number[]; section: string | null; summary: string };
+  printedItems: Array<{ kind: 'paragraph' | 'equation' | 'figure' | 'table' | 'heading' | 'other'; label: string | null; page: number; text: string }>;
+  handwriting: Array<{ text: string; box: { x0: number; y0: number; x1: number; y1: number }; page: number; near: string | null }>;
+  unreadable: string | null;
 };
 
 export type Rect = { x: number; y: number; width: number; height: number };
