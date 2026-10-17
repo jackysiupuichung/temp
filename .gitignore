@@ -1,2 +1,7 @@
 research/papers/**/*.pdf
 .DS_Store
+.jc_cache/
+runs/
+.venv/
+__pycache__/
+.pytest_cache/
