@@ -37,5 +37,6 @@ Downloaded 2026-10-17. Verification: `file` reports PDF and size > 50KB.
 | 2409.05556_sciagents.pdf | arXiv:2409.05556 | SciAgents: Automating scientific discovery through multi-agent intelligent graph reasoning | 43M | OK |
 | 2310.01798_llms-cannot-self-correct.pdf | arXiv:2310.01798 | Large Language Models Cannot Self-Correct Reasoning Yet | 380K | OK |
 | 2507.21046_self-evolving-agents-survey.pdf | arXiv:2507.21046 | A Survey of Self-Evolving Agents: What, When, How, and Where to Evolve on the Path to Artificial Super Intelligence | 5.5M | OK |
+| 2503.14738_desi-dr2-bao-cosmology.pdf | arXiv:2503.14738 | DESI DR2 Results II: Measurements of Baryon Acoustic Oscillations and Cosmological Constraints (target paper for backtest; title verified on arxiv.org abs page) | 12M | OK |
 
 Titles for arXiv entries verified via the arXiv API (export.arxiv.org). bioRxiv title not fetched (marked unverified).
