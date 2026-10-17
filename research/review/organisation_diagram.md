@@ -1,90 +1,77 @@
-# The Library Journal Club: the loop
+# The Library Journal Club: where is the field going?
 
-![The loop](journal_club_schematic.svg)
+![Schematic](journal_club_schematic.svg)
 
 *Source: [journal_club_schematic.svg](journal_club_schematic.svg). Editable in a text editor or by importing into draw.io.*
 
-The simplest self-improving architecture is a loop with an archive. That is what every system in [rsi.md](rsi.md) that keeps improving has in common (Darwin Gödel Machine, AlphaEvolve, AI co-scientist): generate, score, keep everything, and let the next round start from the best of what was kept.
+The club has one goal: given the papers you have read, say where the field goes next. That goal is checkable. Split the library at a date T, let the papers before T talk, and score their directions against the papers after T, which they never saw. ASCollab's agents re-derived findings that were published months later as a side effect ([ascollab.md](ascollab.md) §7); here it is the design.
 
-## Four parts
+## Parts
 
 | Part | Who | Does |
 | --- | --- | --- |
-| You | The human | Set the agenda at 10 pm. Read the minutes at 8 am. |
-| 8 PhD students | One agent per paper in your library | Each writes one note per round: a claim, a critique of another paper, or an idea. |
-| PI | One agent | Scores every note 1-5, checks that the quotes exist in the source, writes one line on what was weak this round. |
-| Archive | One file, `events.jsonl` | Every note with its score. Never deleted. The minutes and the Zotero notes are read from it. |
+| Your library | Zotero | Split once at a date T (e.g. two years ago). |
+| Before T | 8 papers → 8 PhD-student agents | Each knows one paper: claim, evidence, limits. |
+| After T | Held out | The students never see them. They are the answer key, opened only by the backtest. |
+| PI | One agent | Chairs the three rounds, checks every quote exists, ranks the directions and gives each a confidence. |
+| Archive | One file | Map, verdicts, directions with evidence. Next week's club starts from it. |
+| Backtest | A script plus one LLM judge | For each direction: did an after-T paper do it? Hit rate, next to a no-discussion baseline. |
+| You | The human | Set T and the field; read the minutes in the morning. |
 
-## One round
+## One night, three rounds
 
 ```mermaid
 flowchart LR
-    accTitle: One round of the loop
-    accDescr: Students read the four best notes and the PI's weak-spot line from the archive, each writes one note, the PI scores them, and everything is appended to the archive. The archive feeds the next round.
+    accTitle: One night of the club
+    accDescr: Round one maps every pair of before-T papers as agree, disagree, or share a limitation. Round two debates the clashes with verdicts. Round three turns unresolved clashes and shared limitations into five to ten directions with evidence. The backtest scores the directions against the after-T papers.
 
-    archive[("📚 Archive<br/>every note + score")]
-    students["🎓 8 students<br/>one note each"]
-    pi["🪑 PI<br/>scores 1–5, checks quotes,<br/>one weak-spot line"]
+    before["📄 8 papers before T"]
+    r1["1 · Map<br/>28 pairs: agree / disagree /<br/>shared limitation, with quotes"]
+    r2["2 · Debate<br/>each clash, 2 turns<br/>stands / contested / unresolved"]
+    r3["3 · Directions<br/>5–10, each with papers,<br/>passages, confidence"]
+    after["🔒 papers after T<br/>held out"]
+    test["✅ Backtest<br/>hit rate vs<br/>no-discussion baseline"]
+    you["🧑‍🔬 Minutes"]
 
-    archive -- "4 best notes + weak-spot line" --> students
-    students -- "8 notes" --> pi
-    pi -- "notes + scores" --> archive
+    before --> r1 --> r2 --> r3 --> test --> you
+    after -. "answer key" .-> test
 
-    classDef store fill:#fff2cc,stroke:#d6b656,color:#1f2937
-    classDef agents fill:#dae8fc,stroke:#6c8ebf,color:#1f2937
-    classDef chair fill:#f8cecc,stroke:#b85450,color:#1f2937
-    class archive store
-    class students agents
-    class pi chair
+    classDef paper fill:#dae8fc,stroke:#6c8ebf,color:#1f2937
+    classDef round fill:#ffffff,stroke:#6c8ebf,color:#1f2937
+    classDef held fill:#f5f5f5,stroke:#666666,color:#1f2937
+    classDef ok fill:#e8f5e9,stroke:#2e7d32,color:#1f2937
+    classDef person fill:#ffe6cc,stroke:#d79b00,color:#1f2937
+    class before paper
+    class r1,r2,r3 round
+    class after held
+    class test ok
+    class you person
 ```
 
-Three rounds overnight. Round 1 has an empty archive, so the students write from their paper and the agenda alone. Rounds 2 and 3 start from the archive.
-
-## The self-improvement, spelled out
-
-The green arrow in the schematic (archive → students) is the whole point. It carries four things, and each maps to a mechanism the review found in systems that actually compound ([rsi.md](rsi.md) §b):
-
-| Ingredient | In the loop | Borrowed from | Without it |
+| Round | Input | Output | Calls |
 | --- | --- | --- | --- |
-| 1. Never discard | Every note stays in `events.jsonl` with its score | Darwin Gödel Machine archive; ADAS | Round 2 repeats round 1 |
-| 2. Select | Each student reads the 4 best-scored notes before writing | DGM parent sampling; AlphaEvolve program database | Everyone writes about everything; no direction |
-| 3. Feedback | The PI's one weak-spot line is prepended to every prompt | AI co-scientist meta-review digest | Scores go up and down; nothing is learned from them |
-| 4. External check | The PI searches the literature for the top idea each round | Every compounding system has a hard evaluator | The loop drifts toward what the PI's model likes (Huang et al.; Moltbook trilemma) |
+| 1 · Map | 8 papers | For each of 28 pairs: agree / disagree / share a limitation, each citing one passage per paper. The clash list and the shared-limitation list. | 28 |
+| 2 · Debate | The clash list, cap 5 | Both students defend with quotes for 2 turns; the PI rules stands / contested / unresolved. | ~25 |
+| 3 · Directions | Unresolved clashes + shared limitations | 5–10 directions: "the field will move from A to B, because papers 3 and 7 both hit L", each with the papers, the passages, a confidence. A direction without before-T quotes is thrown out. | ~5 |
+| Backtest | Directions + after-T papers | Hit rate; same for one LLM call with the same papers and no discussion. | ~10 |
 
-Without 1-3 it is a pipeline. Without 4 it is a mirror.
+About 60–70 calls per night.
 
-### Round by round
+## Why this goal
 
-| | Round 1: cold | Round 2: warm | Round 3: focused |
-| --- | --- | --- | --- |
-| Reads | The paper + your agenda | 4 best notes + PI's line | 4 best notes + PI's line |
-| Archive | 0 → 8 notes | 8 → 16 | 16 → 24 |
-| Expect | Mostly claims; critiques generic ("sample is small"); ideas pair obvious neighbours | Critiques quote and target the weak spot; students answer round-1 critiques of their paper; ideas build on scored ones | Ideas are falsifiable and cite two passages; top idea has a literature verdict; duplicates gone |
-| PI's line, e.g. | "critiques did not quote the passage they attack" | "ideas do not say what result would falsify them" | stop here |
+- It is what a journal club produces. People leave a reading group with "someone should do X", not with a method-on-dataset combination.
+- It is checkable. The hit rate is the external evaluator that the self-improvement literature says any multi-round loop needs ([rsi.md](rsi.md) §c); without one, an LLM scorer flattens in 3-4 rounds and drifts toward its own taste.
+- Dissent is the raw material. Directions come from the clashes and shared limitations that round 1 surfaces and a single summary averages away.
+- It is a demo line: "In 2023 your papers pointed to X; you saved a 2025 paper that did X."
 
-**Measure it, do not assume it.** Log per round the share of quotes that string-match the source and the mean PI score. If neither rises, say "rounds change", not "rounds get better". Gains from an LLM scorer flatten after 3-4 rounds ([rsi.md](rsi.md) §c), which is why the night stops at three.
+## Leakage guard
 
-## What this loop gives you for free
+The model may already know the after-T papers from training. Three rules, cheapest first:
 
-- **Disputes**: a critique note that scores high *is* a dispute; the PI's score is the verdict.
-- **Collaborations**: an idea note names two papers; that is the green edge.
-- **Minutes**: the top-scored notes of the night, grouped by type.
-- **Zotero**: each paper's notes, written back after round 3.
+1. A direction counts only if it rests on quoted before-T passages. A correct guess without evidence is a miss.
+2. Score on after-T papers newer than the model's training cutoff where you can.
+3. Always report the no-discussion baseline next to the club's hit rate. The claim is that the conversation added something, and the baseline is how you show it.
 
-## Cost
+## What was dropped, and where it went
 
-About 12 calls per round (8 notes, 2 batched scoring calls, 1 weak-spot line, 1 novelty check), ~40 for the night.
-
-## Can it generate new hypotheses?
-
-Yes, candidate ones. The "idea" note type is the hypothesis generator, and with 8 papers the space is small enough to cover: 28 pairs, 24 notes over three rounds. What the loop does and does not guarantee:
-
-- **It will produce hypotheses.** An idea note is "paper X's method on paper Y's data would test Z". ASCollab and the AI co-scientist both produced hypotheses this way that later papers confirmed ([ascollab.md](ascollab.md) §7, [rsi.md](rsi.md) #7); the mechanism is combination across sources plus a scorer.
-- **"New" means new relative to the 8 papers, unless the PI can search.** The loop only sees the archive and the 8 papers. Add one call per round: the PI searches the wider literature (Semantic Scholar or arXiv) for the top idea and marks it `not found` / `already published`. Without that, say "new to this library", not "new".
-- **Rounds change ideas; they do not reliably improve them.** With an LLM scorer and no external check, gains flatten within 3-4 rounds ([rsi.md](rsi.md) §c). Three rounds is the right number.
-- **Make the idea note strict.** Must name two papers, quote one passage from each with its location, and state what result would falsify it. The PI rejects ideas that fail this; that is the only quality gate and it is cheap.
-- **They are candidates.** Both anchor papers say so on stage; so should you.
-
-## Why it is enough
-
-The review found that compounding needs three things: an archive that never discards, a selection rule, and a scorer ([rsi.md](rsi.md) §b). This loop has all three and nothing else. Everything in the earlier versions (groups, leads, discussants, debate turns, meta-review tournaments) is a refinement that can be added once this runs.
+The earlier versions ([organisation_structure.md](organisation_structure.md) §4) had topic groups, group leads, meta-review tournaments, Elo and a self-improvement claim. None of it is needed for this goal. The archive is kept as memory so next week's club does not re-argue settled clashes. Self-improvement, if wanted later, is one addition: the PI rewrites the direction-writing prompt between weeks and the diff goes in the minutes.
