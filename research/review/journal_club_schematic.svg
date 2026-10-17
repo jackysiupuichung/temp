@@ -38,38 +38,38 @@
 
   <rect x="0" y="0" width="1000" height="720" fill="#ffffff"/>
 
-  <text x="30" y="36" class="title">Library Journal Club — one lab</text>
-  <text x="30" y="56" class="sub">Scientist → convener → papers. One meeting, one shared transcript. Numbers 1–9 give the order of events in one session.</text>
+  <text x="30" y="36" class="title">Library Journal Club — one lab, familiar roles</text>
+  <text x="30" y="56" class="sub">You → PI → PhD students (one per paper). One lab meeting, one shared transcript. Numbers 1–9 give the order of events in one meeting.</text>
 
   <!-- Scientist -->
   <rect x="30" y="85" width="170" height="90" rx="8" class="scientist"/>
   <use href="#i-flask" x="42" y="98" width="30" height="30" fill="#d79b00"/>
-  <text x="82" y="112" class="tb">Scientist</text>
+  <text x="82" y="112" class="tb">You (the scientist)</text>
   <text x="82" y="128" class="ts">sets the agenda once</text>
   <text x="82" y="142" class="ts">reads the minutes</text>
   <text x="82" y="156" class="ts">settles "unresolved"</text>
 
   <!-- Chair container -->
   <rect x="300" y="68" width="640" height="162" rx="6" class="cont"/>
-  <text x="310" y="83" class="contlbl">Chair</text>
+  <text x="310" y="83" class="contlbl">Senior staff</text>
 
   <rect x="520" y="85" width="200" height="60" rx="8" class="chair"/>
   <use href="#i-gavel" x="530" y="100" width="28" height="28" fill="#b85450"/>
-  <text x="566" y="106" class="tb">Convener</text>
-  <text x="566" y="121" class="ts">chairs, synthesises, decides</text>
-  <text x="566" y="135" class="ts">must "choose one"</text>
+  <text x="566" y="106" class="tb">PI</text>
+  <text x="566" y="121" class="ts">runs the meeting, sums up,</text>
+  <text x="566" y="135" class="ts">decides; must "choose one"</text>
 
   <rect x="320" y="160" width="200" height="55" rx="8" class="chair"/>
   <use href="#i-magnifier" x="330" y="174" width="26" height="26" fill="#b85450" stroke="#b85450"/>
-  <text x="366" y="180" class="tb">Critic</text>
-  <text x="366" y="195" class="ts">rigour; do the quotes exist</text>
-  <text x="366" y="208" class="ts">in the source? feedback only</text>
+  <text x="366" y="180" class="tb">Senior postdoc</text>
+  <text x="366" y="195" class="ts">the tough reviewer: do the</text>
+  <text x="366" y="208" class="ts">quotes exist? feedback only</text>
 
   <rect x="720" y="160" width="200" height="55" rx="8" class="chair"/>
   <use href="#i-pen" x="730" y="174" width="26" height="26" fill="#b85450"/>
-  <text x="766" y="180" class="tb">Scribe</text>
-  <text x="766" y="195" class="ts">structured summary,</text>
-  <text x="766" y="208" class="ts">events.jsonl, Zotero notes</text>
+  <text x="766" y="180" class="tb">Lab manager</text>
+  <text x="766" y="195" class="ts">keeps the minutes,</text>
+  <text x="766" y="208" class="ts">updates Zotero, events.jsonl</text>
 
   <!-- 1 agenda -->
   <path d="M200 105H520" class="edge" marker-end="url(#ah)"/>
@@ -90,7 +90,7 @@
   <circle cx="620" cy="200" r="9" class="num"/><text x="620" y="203.5" class="numt" text-anchor="middle">2</text>
   <text x="634" y="196" class="t">opens ↓</text>
   <circle cx="620" cy="250" r="9" class="num"/><text x="620" y="253.5" class="numt" text-anchor="middle">4</text>
-  <text x="634" y="254" class="t">synthesises each round ↑</text>
+  <text x="634" y="254" class="t">sums up each round ↑</text>
 
   <!-- 5 critic -> lab -->
   <path d="M340 215V268" class="edge2" marker-end="url(#ah)"/>
@@ -99,28 +99,28 @@
 
   <!-- The lab -->
   <rect x="200" y="268" width="760" height="190" rx="6" class="lab"/>
-  <text x="212" y="286" class="contlbl">The lab: 20 papers in one meeting, one shared transcript (Virtual Lab team meeting)</text>
+  <text x="212" y="286" class="contlbl">The lab meeting: 20 PhD students, one per paper, one shared transcript (Virtual Lab team meeting)</text>
 
   <rect x="220" y="305" width="200" height="56" rx="6" class="paper"/>
   <use href="#i-doc" x="228" y="321" width="24" height="24" fill="#ffffff" stroke="#6c8ebf"/>
-  <text x="260" y="325" class="tb">Presenter</text>
-  <text x="260" y="340" class="ts">one paper per turn:</text>
+  <text x="260" y="325" class="tb">Presenting student</text>
+  <text x="260" y="340" class="ts">one paper per turn: its</text>
   <text x="260" y="353" class="ts">claim, evidence, limits</text>
 
   <rect x="455" y="305" width="110" height="56" rx="6" class="paper"/>
   <use href="#i-doc" x="461" y="321" width="22" height="22" fill="#ffffff" stroke="#6c8ebf"/>
-  <text x="488" y="325" class="tb">Discussant</text>
-  <text x="488" y="340" class="ts">nearest</text>
-  <text x="488" y="353" class="ts">paper</text>
+  <text x="488" y="325" class="tb">Student 2</text>
+  <text x="488" y="340" class="ts">closest topic,</text>
+  <text x="488" y="353" class="ts">discusses</text>
   <rect x="575" y="305" width="110" height="56" rx="6" class="paper"/>
   <use href="#i-doc" x="581" y="321" width="22" height="22" fill="#ffffff" stroke="#6c8ebf"/>
-  <text x="608" y="325" class="tb">Discussant</text>
-  <text x="608" y="340" class="ts">2nd nearest</text>
-  <text x="608" y="353" class="ts">paper</text>
+  <text x="608" y="325" class="tb">Student 3</text>
+  <text x="608" y="340" class="ts">2nd closest,</text>
+  <text x="608" y="353" class="ts">discusses</text>
 
   <rect x="720" y="305" width="220" height="56" rx="6" class="paper"/>
   <use href="#i-docs" x="728" y="321" width="24" height="24" fill="#ffffff" stroke="#6c8ebf"/>
-  <text x="760" y="325" class="tb">Members (the other 17)</text>
+  <text x="760" y="325" class="tb">Rest of the lab (17 students)</text>
   <text x="760" y="340" class="ts">may "pass", or disagree</text>
   <text x="760" y="353" class="ts">and name the paper</text>
 
@@ -130,11 +130,11 @@
   <path d="M565 333H575" class="edge" marker-end="url(#ah)"/>
   <path d="M685 333H720" class="edge" marker-end="url(#ah)"/>
 
-  <text x="212" y="386" class="t">Speaking order each round: presenter → two discussants → members → critic → convener synthesises. 2–3 rounds per item.</text>
-  <text x="212" y="404" class="ts">Scores: discussants rate Support, Soundness, Significance, Originality 1–4; the convener keeps the scores in the summary.</text>
-  <text x="212" y="419" class="ts">Disputes: when two papers' claims clash, each defends with quotes for 2 turns; the convener rules stands / contested / unresolved.</text>
-  <text x="212" y="434" class="ts">Collaborations: the convener pairs two papers and asks for one combination ("C's method on D's data could test X"); the critic checks feasibility.</text>
-  <text x="212" y="449" class="ts">Only the convener's structured summary leaves the meeting; the transcript stays in the lab.</text>
+  <text x="212" y="386" class="t">Speaking order each round: presenting student → two discussing students → rest of the lab → postdoc → PI sums up. 2–3 rounds per item.</text>
+  <text x="212" y="404" class="ts">Scores: the two discussing students rate Support, Soundness, Significance, Originality 1–4; the PI keeps the scores in the summary.</text>
+  <text x="212" y="419" class="ts">Disputes: when two students' papers clash, each defends with quotes for 2 turns; the PI rules stands / contested / unresolved.</text>
+  <text x="212" y="434" class="ts">Collaborations: the PI pairs two students and asks for one combination ("C's method on D's data could test X"); the postdoc checks feasibility.</text>
+  <text x="212" y="449" class="ts">Only the PI's structured summary leaves the meeting; the transcript stays in the lab.</text>
 
   <!-- 7 scribe -> archive -->
   <path d="M920 187H975V525H940" class="edge" marker-end="url(#ah)"/>
@@ -165,7 +165,7 @@
   <circle cx="710" cy="525" r="9" class="num"/><text x="710" y="528.5" class="numt" text-anchor="middle">8</text>
   <path d="M840 560V580H350V560" class="edge" marker-end="url(#ah)"/>
   <circle cx="600" cy="580" r="9" class="num"/><text x="600" y="583.5" class="numt" text-anchor="middle">8</text>
-  <text x="612" y="575" class="ts">written back after session 3</text>
+  <text x="612" y="575" class="ts">written back after meeting 3</text>
 
   <!-- 9 minutes -> scientist -->
   <path d="M260 525H120V175" class="edge" marker-end="url(#ah)"/>
@@ -174,16 +174,16 @@
 
   <!-- Session band -->
   <rect x="30" y="615" width="945" height="80" rx="6" class="cont"/>
-  <text x="40" y="631" class="contlbl">Overnight: the same lab meets three times</text>
+  <text x="40" y="631" class="contlbl">Overnight: the lab meets three times</text>
   <rect x="45" y="642" width="290" height="40" rx="6" class="session"/>
-  <text x="55" y="659" class="tb">Session 1 · Introductions</text>
-  <text x="55" y="674" class="ts">each paper presents in turn; convener lists the conflicts</text>
+  <text x="55" y="659" class="tb">Meeting 1 · Introductions</text>
+  <text x="55" y="674" class="ts">every student presents their paper; the PI lists the conflicts</text>
   <path d="M335 662H355" class="edge" marker-end="url(#ah)"/>
   <rect x="355" y="642" width="290" height="40" rx="6" class="session"/>
-  <text x="365" y="659" class="tb">Session 2 · Debate</text>
-  <text x="365" y="674" class="ts">the papers in conflict argue; stands / contested / unresolved</text>
+  <text x="365" y="659" class="tb">Meeting 2 · Journal club debate</text>
+  <text x="365" y="674" class="ts">the students in conflict argue; stands / contested / unresolved</text>
   <path d="M645 662H665" class="edge" marker-end="url(#ah)"/>
   <rect x="665" y="642" width="295" height="40" rx="6" class="session"/>
-  <text x="675" y="659" class="tb">Session 3 · Proposals</text>
-  <text x="675" y="674" class="ts">convener pairs papers; one idea per pair; final minutes</text>
+  <text x="675" y="659" class="tb">Meeting 3 · Brainstorm</text>
+  <text x="675" y="674" class="ts">the PI pairs students; one idea per pair; final minutes</text>
 </svg>
