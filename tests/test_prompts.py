@@ -21,6 +21,7 @@ HEADERS = {
     "directions": ["AGENDA", "N"],
     "baseline": ["AGENDA", "N"],
     "judge": ["DIRECTION", "FROM", "TO", "BECAUSE", "AFTER_IDS"],
+    "synthesis": ["AGENDA"],
 }
 
 

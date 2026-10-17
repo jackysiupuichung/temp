@@ -60,6 +60,17 @@ def _rejected_counts(events: list[Event]) -> dict[str, int]:
     return {t: sum(1 for e in events if e.type == t) for t in REJECTED_TYPES}
 
 
+def _pairs(events: list[Event], relation: str) -> list[dict]:
+    """Pair-verdict payloads of one relation from the last map window, in event order."""
+    return [e.payload for e in _window(events, "map") if e.type == "pair_verdict" and e.payload.get("relation") == relation]
+
+
+def _synthesis(events: list[Event]) -> dict | None:
+    """Payload of the last synthesis event, if any."""
+    found = [e.payload for e in _window(events, "synthesis") if e.type == "synthesis"]
+    return found[-1] if found else None
+
+
 def _report(events: list[Event]) -> dict | None:
     """Payload of the last backtest report event, if any."""
     reports = [e.payload for e in events if e.step == "backtest" and e.type == "report"]
@@ -132,6 +143,37 @@ def _backtest_section(report: dict) -> list[str]:
     return ["## Backtest", "", f"Club: {club}. Baseline: {base}. Judge model: {report.get('judge_model', '')}.", ""]
 
 
+KIND_LABELS = {"consensus": "Agreed", "dissent": "Disputed", "gap": "Open", "direction": "Next"}
+
+
+def _overview_section(synthesis: dict | None, by_id: dict[str, PaperCard]) -> list[str]:
+    """`## Overview`: the prose, then the key points grouped by kind with their quotes."""
+    lines = ["## Overview", ""]
+    if synthesis is None:
+        return lines + ["(no synthesis in the archive)", ""]
+    lines += [" ".join(str(synthesis.get("overview", "")).split()), ""]
+    for kind, label in KIND_LABELS.items():
+        points = [k for k in synthesis.get("key_points", []) if k.get("kind") == kind]
+        for k in points:
+            lines.append(f"- **{label}:** {' '.join(str(k.get('text', '')).split())}")
+            lines.extend(f"  {_quote_line(by_id, q)}" for q in k.get("quotes", []))
+    lines.append("")
+    return lines
+
+
+def _pairs_section(title: str, pairs: list[dict], by_id: dict[str, PaperCard]) -> list[str]:
+    """A section listing pair verdicts of one relation, each with its two quotes."""
+    lines = [title, ""]
+    if not pairs:
+        return lines + ["(none)", ""]
+    for p in pairs:
+        lines.append(f"- {_citekey(by_id, p['a'])} and {_citekey(by_id, p['b'])}: {' '.join(str(p.get('note', '')).split())}")
+        lines.append(f"  {_quote_line(by_id, p['quote_a'])}")
+        lines.append(f"  {_quote_line(by_id, p['quote_b'])}")
+    lines.append("")
+    return lines
+
+
 def render_minutes(events: list[Event], cards: list[PaperCard]) -> str:
     """Markdown minutes from events and cards; pure."""
     by_id = {c.id: c for c in cards}
@@ -146,9 +188,11 @@ def render_minutes(events: list[Event], cards: list[PaperCard]) -> str:
         f"- model: {started.get('model', '')}",
         f"- cards: {len(cards)}",
         "",
-        "## Directions",
-        "",
     ]
+    lines.extend(_overview_section(_synthesis(events), by_id))
+    lines.extend(_pairs_section("## Consensus", _pairs(events, "agree"), by_id))
+    lines.extend(_pairs_section("## Shared limitations", _pairs(events, "shared_limitation"), by_id))
+    lines.extend(["## Directions", ""])
     if directions:
         for i, d in enumerate(directions, start=1):
             lines.extend(_direction_block(i, d, by_id))

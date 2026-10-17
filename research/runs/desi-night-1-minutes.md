@@ -5,6 +5,88 @@
 - model: claude-sonnet-5-5
 - cards: 8
 
+## Overview
+
+Taken together, these papers establish that BAO is a robust geometric probe. desi2024iii measures it to 0.52% across six bins, desi2024iv adds a 2% Lyman-alpha measurement at z = 2.33, and planck2018vi and eboss2020 show that earlier BAO, CMB and supernova data fit a cosmological constant. The new result is desi2024vi, where DESI with CMB prefers w0 > -1 and wa < 0 at 2.6 sigma, rising to 3.9 sigma with DES-SN5YR (dessn5yr2024). The disputes were mostly ruled against reading this at face value. The Planck and eBOSS results were judged not like-for-like with DESI's, because they use older BAO data or fit a constant w. efstathiou2024 showed that Pantheon+ alone gives no support for evolution and that recalibrating DES-SN5YR's low-redshift supernovae removes its preference, which limits DESI's claim that the supernova sets are consistent. lewis2024's null-energy-condition argument is conditional on that condition and on geometry alone, so DESI's caution stands. None of the papers can say why DESI's z = 0.71 bin differs from eBOSS by 2.5-3 sigma, which supernova bias corrections are correct, or whether the systematics are excluded. The ranked directions point to cross-calibrated low-redshift supernova reanalyses, whether the z < 0.8 offset persists in the next DESI release, and NEC-aware interpretation in place of CPL contours.
+
+- **Agreed:** DESI DR1 BAO and its Lyman-alpha companion deliver precise distance measurements that improve on SDSS, with systematic budgets stated as small relative to statistics.
+  > the combined precision of the BAO measurements across the six different redshift bins is ∼0.52%, marking a 1.2-fold improvement over the previous state-of-the-art results using only first-year data (desi2024iii, Abstract)
+  > The statistical uncertainties on the BAO parameters from just one year of DESI observations are already smaller than the ones from dMdB20, who used 10 years of BOSS and eBOSS observations. (desi2024iv, Sec. 8)
+- **Agreed:** Pantheon+ with Planck-based fits, and older SDSS BAO with Planck, show no support for time-varying dark energy.
+  > There is no improvement in χ2 compared to ΛCDM if w0 and wa are allowed to vary. The Pantheon+ SN data therefore offer no support for models with a time varying equation-of-state. (efstathiou2024, Sec. 2)
+  > The SDSS BAO measurements demonstrate that the observed cosmic acceleration is best described by a dark energy equation of state that is consistent with a cosmological constant to better than 6% precision when combined with the Planck temperature and polarization data. (eboss2020, Sec. VII, p. 31)
+- **Disputed:** The DESI-versus-Planck dispute over a cosmological constant stays contested: DESI's low-z offset is unproven until Y3/Y5, and Planck's constant-w result does not test DESI's (w0, wa) preference.
+  > We find our measurements are systematically larger than the prediction of the Planck 2018-ΛCDM at z <0.8. (desi2024iii, Abstract)
+  > Combining Planck data with Pantheon supernovae and BAO data, the equation of state of dark energy is tightly constrained to w0 =−1.03± 0.03, consistent with a cosmological constant. (planck2018vi, Sec. 8, p. 62)
+- **Disputed:** On whether the supernova sets are consistent, the ruling went largely for Efstathiou, whose recalibration removes DES5Y's preference, though DESI+CMB alone still gives 2.6 sigma and he cannot show which bias corrections are wrong.
+  > All three of the primary BAO, CMB and SN Ia probes contribute partially to this tension and the results including the 3 SN Ia datasets are mutually consistent with each other. (desi2024vi, Sec. 8)
+  > Evidently, the recalibrated DES5Y catalogue does not show a statistically significant preference for a time varying equation-of-state. (efstathiou2024, Sec. 3)
+- **Disputed:** Lewis and Chamberlain argue the CPL contours carry no consistent extra BAO information, but the dispute stays linked because it rests on the unproven null energy condition and on geometry alone, so DESI's caution stands.
+  > The constraint contours in the CPL plane therefore have no consistent interpretation in terms of additional information from BAO (lewis2024, Sec. IV)
+  > However, we caution against over-interpretation of this result, since at least some of the (w0, wa) models preferred by our analysis could be mapped to quintessence models (desi2024vi, Sec. 5.2)
+- **Open:** The library cannot explain the z ≈ 0.7 DESI-eBOSS discrepancy, whose 3 sigma is only an upper limit, nor exclude systematics behind the evolving-dark-energy preference.
+  > While this 2.5 σ–3σ discrepancy warrants attention, we have not identified any sources of non-statistical discrepancy from both sets of the data. (desi2024iii, Sec. 8.2)
+  > It remains important to thoroughly examine unaccounted-for sources of systematic uncertainties or inconsistencies between the different datasets that might be contributing to these results. (desi2024vi, Sec. 8)
+- **Next:** Supernova-driven significances are expected to be re-reported after a cross-calibrated reanalysis of the low-redshift anchor, with the DES5Y-driven 3.9 sigma shrinking toward the Pantheon+ level.
+  > it is important to recognize that (a) the low- z sample is the one for which we have the least systematic control (dessn5yr2024, Sec. 5.1.2)
+  > Most of the low redshift surveys are offset by ∼ 0.04−0.05 mag. relative to the more distant DES supernovae. (efstathiou2024, Sec. 3)
+- **Next:** The next DESI release will be judged on whether the z<0.8 offset and the z~0.7 disagreement with eBOSS persist, with a resolved cross-correlation replacing the 3 sigma upper-limit quote.
+  > Hence, the cross-correlation coefficient could be much lower than the theoretical estimate, suggesting that the observed 3σ discrepancy between SDSS and DESI is likely an upper limit. (desi2024iii, Sec. 8.2)
+
+## Consensus
+
+- desi2024iii and dessn5yr2024: Both find mild, low-significance departures from a Planck-like LCDM expansion history at low to intermediate redshift, but neither claims evolving dark energy on its own.
+  > We find our measurements are systematically larger than the prediction of the Planck 2018-ΛCDM at z <0.8. (desi2024iii, Abstract)
+  > Fitting DES-SN5YR alone to the Flat- w0waCDM model gives an equation of state that is slightly over 2σ from a cosmological constant, marginally preferring a time-varying dark energy (dessn5yr2024, Sec. 4.1.4)
+- desi2024iii and eboss2020: Both report a roughly 3 sigma outlier in a SDSS/eBOSS measurement relative to a LCDM expectation or to DESI, but they do not directly contradict or support each other on the same question, so this is only a weak agreement.
+  > Accordingly, we found a large discrepancy between the DESI BAO measurement at zeff = 0.71 and the SDSS measurement at zeff = 0.7. (desi2024iii, Sec. 9)
+  > After accounting for the covariance between BAO and RSD measurements, the measurement differs from the ΛCDM prediction by 3.0 standard deviations. (eboss2020, Sec. VI.A, p. 26)
+- desi2024iii and lewis2024: Both describe DESI DR1 BAO points deviating from Planck LCDM in the lower-distance direction at z<~1, which Lewis shows lies in the NEC-excluded region.
+  > We find our measurements are systematically larger than the prediction of the Planck 2018-ΛCDM at z <0.8. (desi2024iii, Abstract)
+  > For three of the redshift bins – LRG2, LRG3+ELG2, and ELG2 – the data point centres lie within the exclusion region. (lewis2024, Sec. IV)
+- desi2024iv and eboss2020: Both treat Lyman-alpha BAO as a distance probe at z>2 that DESI improves on SDSS/eBOSS; this is weak support and does not address dark-energy evolution directly.
+  > The statistical uncertainties on the BAO parameters from just one year of DESI observations are already smaller than the ones from dMdB20, who used 10 years of BOSS and eBOSS observations. (desi2024iv, Sec. 8)
+  > The SDSS BAO measurements demonstrate that the observed cosmic acceleration is best described by a dark energy equation of state that is consistent with a cosmological constant to better than 6% precision when combined with the Planck temperature and polarization data. (eboss2020, Sec. VII, p. 31)
+- desi2024vi and dessn5yr2024: Both papers find a mild preference for evolving, thawing-like dark energy (w0 > -1) beyond a cosmological constant. DES-SN5YR reaches about 2 sigma alone, and DESI reaches 2.5 to 3.9 sigma in combination, so the DES result weakly supports DESI's.
+  > combinations of DESI with CMB or with type Ia supernovae (SN Ia) individually prefer w0 > −1 and wa < 0 (desi2024vi, Abstract)
+  > Fitting DES-SN5YR alone to the Flat- w0waCDM model gives an equation of state that is slightly over 2σ from a cosmological constant, marginally preferring a time-varying dark energy (dessn5yr2024, Sec. 4.1.4)
+- dessn5yr2024 and eboss2020: Both find the dark-energy equation of state close to w = -1 and compatible with LCDM, with at most a mild SN-only pull toward w > -1 in DES. The datasets differ, so this is weak agreement and not a contradiction.
+  > Our best fit equation of state parameter is slightly (more than 1 σ) higher than the cosmological constant value of w = −1 (dessn5yr2024, Sec. 5.1.2)
+  > The SDSS BAO measurements demonstrate that the observed cosmic acceleration is best described by a dark energy equation of state that is consistent with a cosmological constant to better than 6% precision when combined with the Planck temperature and polarization data. (eboss2020, Sec. VII, p. 31)
+- dessn5yr2024 and lewis2024: Both papers cast doubt on reading the evolving dark energy preference at face value. DES says its w > -1 pull depends on the low-z sample, which has the least systematic control. Lewis says the BAO (w0, wa) contours add no consistent information, so any thawing pull must come from low-z supernovae. This is a weak agreement.
+  > it is important to recognize that (a) the low- z sample is the one for which we have the least systematic control (dessn5yr2024, Sec. 5.1.2)
+  > The constraint contours in the CPL plane therefore have no consistent interpretation in terms of additional information from BAO (lewis2024, Sec. IV)
+- dessn5yr2024 and planck2018vi: Both find a constant dark-energy equation of state near w = -1 (DES only slightly above by about 1 sigma, Planck+SN+BAO consistent with Lambda), so neither gives strong evidence for evolving dark energy.
+  > Our best fit equation of state parameter is slightly (more than 1 σ) higher than the cosmological constant value of w = −1 (dessn5yr2024, Sec. 5.1.2)
+  > Combining Planck data with Pantheon supernovae and BAO data, the equation of state of dark energy is tightly constrained to w0 =−1.03± 0.03, consistent with a cosmological constant. (planck2018vi, Sec. 8, p. 62)
+- eboss2020 and efstathiou2024: Both find data consistent with a cosmological constant: eBOSS BAO+Planck and Pantheon+ alone show no support for evolving dark energy.
+  > The SDSS BAO measurements demonstrate that the observed cosmic acceleration is best described by a dark energy equation of state that is consistent with a cosmological constant to better than 6% precision when combined with the Planck temperature and polarization data. (eboss2020, Sec. VII, p. 31)
+  > The Pantheon+ SN data therefore offer no support for models with a time varying equation-of-state. (efstathiou2024, Sec. 2)
+- eboss2020 and planck2018vi: Both find a low H0 (below 68 km/s/Mpc) from CMB or BAO-anchored routes, in tension with the local distance-ladder value.
+  > In all cases, the central values remain below H0 = 68 km s−1Mpc−1, and the uncertainties remain at 1 km s−1Mpc−1 or better. (eboss2020, Sec. IV.B, p. 22)
+  > The Planck base-ΛCDM cosmology requires a Hubble constant H0 = (67.4± 0.5) km s−1Mpc−1, in substantial 4.4σ tension with the latest local determination by Riess et al. (2019). (planck2018vi, Sec. 8, p. 62)
+- efstathiou2024 and lewis2024: Both place the pull toward evolving dark energy in low-redshift supernova calibration, not in BAO geometry. Efstathiou finds a 0.04-0.05 mag offset in the DES5Y low-redshift samples. Lewis finds the CPL contours carry no extra BAO information beyond LCDM.
+  > Most of the low redshift surveys are offset by ∼ 0.04−0.05 mag. relative to the more distant DES supernovae. (efstathiou2024, Sec. 3)
+  > The constraint contours in the CPL plane therefore have no consistent interpretation in terms of additional information from BAO (lewis2024, Sec. IV)
+- efstathiou2024 and planck2018vi: Both find that Planck-based fits with Pantheon-family supernovae give no evidence for a time-varying dark-energy equation of state, so Planck 2018 supports Efstathiou's Planck-LCDM-consistent Pantheon+ result.
+  > There is no improvement in χ2 compared to ΛCDM if w0 and wa are allowed to vary. The Pantheon+ SN data therefore offer no support for models with a time varying equation-of-state. (efstathiou2024, Sec. 2)
+  > Combining Planck data with Pantheon supernovae and BAO data, the equation of state of dark energy is tightly constrained to w0 =−1.03± 0.03, consistent with a cosmological constant. (planck2018vi, Sec. 8, p. 62)
+- lewis2024 and planck2018vi: Both indicate that dark-energy extensions anchored to the CMB acoustic scale do not relieve the H0 tension (Lewis shows NEC-consistent dark energy only worsens it), a weak agreement.
+  > this is now sufficient to show that null-energy consistent dark energy can only exacerbate the Hubble tension. (lewis2024, Sec. II.B.1)
+  > The Planck base-ΛCDM cosmology requires a Hubble constant H0 = (67.4± 0.5) km s−1Mpc−1, in substantial 4.4σ tension with the latest local determination by Riess et al. (2019). (planck2018vi, Sec. 8, p. 62)
+
+## Shared limitations
+
+- desi2024iii and desi2024vi: Both papers say that unexplained or unexcluded systematics in the data, whether the z~0.7 DESI–SDSS discrepancy or dataset inconsistencies, could still be behind the low-z BAO offset and the evolving dark energy preference.
+  > While this 2.5 σ–3σ discrepancy warrants attention, we have not identified any sources of non-statistical discrepancy from both sets of the data. (desi2024iii, Sec. 8.2)
+  > It remains important to thoroughly examine unaccounted-for sources of systematic uncertainties or inconsistencies between the different datasets that might be contributing to these results. (desi2024vi, Sec. 8)
+- desi2024iv and desi2024vi: Both papers leave residual unquantified systematics (Lya BAO mock offsets and unstudied cross-correlation shifts vs. possible unaccounted systematics behind the dark-energy preference) as an open caveat, though this is a loose match.
+  > Because we find similar discrepancies among the two sets of mocks (LyaColore and Saclay), we can not use those offsets to correct the measurements and we hence have to treat them as systematic uncertainties. (desi2024iv, Sec. 6.5)
+  > It remains important to thoroughly examine unaccounted-for sources of systematic uncertainties or inconsistencies between the different datasets that might be contributing to these results. (desi2024vi, Sec. 8)
+- desi2024iv and planck2018vi: Both note that Lyα BAO at z~2.3-2.4 is limited by large/noisy uncertainties relative to galaxy BAO, restricting its constraining power.
+  > in DESI DR1 the majority of quasars have only been observed once and are therefore on average noisier than in SDSS DR16. (desi2024iv, Sec. 7.2)
+  > The errors on these high-redshift BAO measurements are still quite large in comparison with the galaxy measurements and so we do not include them in our default BAO compilation. (planck2018vi, Sec. 5.1, p. 23)
+
 ## Directions
 
 1. **Evolving-dark-energy claims will move from quoting DESI+CMB+SN significances with the DES5Y compilation as-is to reporting them after a cross-calibrated, common-pipeline reanalysis of the low-z SN anchor, with the DES5Y-driven 3.9 sigma shrinking toward the Pantheon+ level.** (confidence 0.60)

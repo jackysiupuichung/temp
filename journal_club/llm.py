@@ -430,6 +430,19 @@ class MockLLM:
 
     # -- generic fallback -----------------------------------------------------
 
+    def _kind_synthesis(self, rng: random.Random, h: dict[str, str], q: list, user: str) -> dict:
+        """Overview prose plus one key point per kind, each backed by a real QUOTE line from a distinct paper."""
+        by_paper: dict[str, dict[str, str]] = {}
+        for quote in q:
+            by_paper.setdefault(quote["paper_id"], quote)
+        pool = [dict(v) for v in by_paper.values()]
+        points = []
+        for i, kind in enumerate(("consensus", "dissent", "gap", "direction")):
+            if i < len(pool):
+                points.append({"kind": kind, "text": f"Mock {kind} point {i + 1} on {pool[i]['paper_id']}.", "quotes": [pool[i]]})
+        overview = f"Mock overview of {len(by_paper)} papers for agenda: {h.get('AGENDA', '')}. " * 3
+        return {"overview": overview.strip(), "key_points": points}
+
     def _generic(self, rng: random.Random, schema: dict, quotes: list, field: str) -> Any:
         """Schema walk producing one plausible value."""
         if "anyOf" in schema:

@@ -126,7 +126,7 @@ def test_rerun_makes_zero_llm_calls(night: tuple[NightResult, MockLLM], cards: l
     assert len(mock.calls) == n_calls
     assert second == first
     types = [e.type for e in tmp_archive.read()]
-    assert types.count("step_skipped") == 3
+    assert types.count("step_skipped") == 4
     assert types.count("run_started") == 1 and "agenda_changed" not in types
     for step in ("map", "debate", "directions"):
         assert _types(tmp_archive, step)[-1] == "step_skipped"
@@ -207,7 +207,7 @@ def test_backtest_on_a_second_archive(cards: list[PaperCard], tmp_path: Path, mo
     assert len(report.baseline_hits) == len(report.baseline_directions)
     assert all(k == "judge" for k, _ in judge_llm.calls)
     for kind, user in mock.calls:
-        assert kind in {"map", "debate_turn", "debate_verdict", "directions", "baseline"}
+        assert kind in {"map", "debate_turn", "debate_verdict", "directions", "baseline", "synthesis"}
         assert "sc07" not in user and "sc08" not in user
     report_md = (tmp_path / "bt" / "report.md").read_text(encoding="utf-8")
     assert (tmp_path / "bt" / "minutes.md").exists()
