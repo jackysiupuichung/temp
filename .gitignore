@@ -1,2 +1,3 @@
 research/papers/**/*.pdf
+!research/papers/desi_before_T/*.pdf
 .DS_Store
