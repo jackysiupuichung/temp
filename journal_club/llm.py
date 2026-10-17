@@ -8,6 +8,7 @@ import logging
 import os
 import random
 import re
+import tempfile
 import threading
 import time
 from collections.abc import Callable
@@ -159,6 +160,97 @@ class AnthropicLLM:
             data = json.loads(text)
         except json.JSONDecodeError as exc:
             raise LLMError(f"{kind}: invalid JSON: {exc}") from exc
+        problems = check_schema(data, schema)
+        if problems:
+            raise LLMError(f"{kind}: output violates schema: {problems[:5]}")
+        return data
+
+
+# ------------------------------------------------------------ claude agent sdk
+
+
+class ClaudeAgentLLM:
+    """Structured JSON through the Claude Agent SDK, which runs on the Claude Code login (a subscription), not an API key.
+
+    Every call is a fresh, tool-less, settings-free session in a scratch cwd, so no
+    project CLAUDE.md or tool can leak into a prompt. Async under the hood; each
+    call runs its own event loop, so it is safe from worker threads.
+    """
+
+    def __init__(
+        self,
+        model: str = DEFAULT_MODEL,
+        cwd: str | Path | None = None,
+        max_budget_usd: float = 2.0,
+        timeout_s: float = 600.0,
+    ) -> None:
+        """Refuse to start if an API key is set: in non-interactive mode the key wins and is billed."""
+        if os.environ.get("ANTHROPIC_API_KEY"):
+            raise LLMError("ClaudeAgentLLM: unset ANTHROPIC_API_KEY so the Claude Code login is used")
+        self.model = model
+        self.cwd = Path(cwd) if cwd else Path(tempfile.mkdtemp(prefix="jc-agent-"))
+        self.max_budget_usd = max_budget_usd
+        self.timeout_s = timeout_s
+
+    def _options(self, system: str, schema: dict) -> Any:
+        """One isolated session: no tools, no settings, no prompts, JSON-schema output."""
+        from claude_agent_sdk import ClaudeAgentOptions
+
+        return ClaudeAgentOptions(
+            system_prompt=system,
+            model=self.model,
+            max_turns=2,
+            tools=[],
+            allowed_tools=[],
+            setting_sources=[],
+            cwd=str(self.cwd),
+            permission_mode="dontAsk",
+            max_budget_usd=self.max_budget_usd,
+            output_format={"type": "json_schema", "schema": schema},
+            env={"CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1"},
+        )
+
+    async def _run(self, kind: str, system: str, user: str, schema: dict) -> Any:
+        """Drive query() to its ResultMessage."""
+        from claude_agent_sdk import ResultMessage, query
+
+        final = None
+        async for msg in query(prompt=user, options=self._options(system, schema)):
+            if isinstance(msg, ResultMessage):
+                final = msg
+        if final is None:
+            raise LLMError(f"{kind}: no ResultMessage from the agent SDK")
+        return final
+
+    def complete_json(self, kind: str, system: str, user: str, schema: dict) -> dict:
+        """One agent session; SDK failures, refusals and schema misses surface as LLMError."""
+        import asyncio
+
+        t0 = time.monotonic()
+        try:
+            result = asyncio.run(asyncio.wait_for(self._run(kind, system, user, schema), timeout=self.timeout_s))
+        except LLMError:
+            raise
+        except Exception as exc:  # CLINotFoundError, ProcessError, ResultError, TimeoutError, ...
+            raise LLMError(f"{kind}: {type(exc).__name__}: {exc}") from exc
+        log.info(
+            "llm kind=%s model=%s backend=agent turns=%s cost_usd=%s elapsed=%.1fs",
+            kind,
+            self.model,
+            getattr(result, "num_turns", "?"),
+            getattr(result, "total_cost_usd", "?"),
+            time.monotonic() - t0,
+        )
+        subtype = getattr(result, "subtype", "success")
+        if getattr(result, "is_error", False) or subtype != "success":
+            raise LLMError(f"{kind}: agent SDK returned {subtype}: {getattr(result, 'errors', None)}")
+        data = getattr(result, "structured_output", None)
+        if data is None:
+            text = getattr(result, "result", None) or ""
+            try:
+                data = json.loads(text)
+            except json.JSONDecodeError as exc:
+                raise LLMError(f"{kind}: no structured_output and result is not JSON: {exc}") from exc
         problems = check_schema(data, schema)
         if problems:
             raise LLMError(f"{kind}: output violates schema: {problems[:5]}")
@@ -440,14 +532,22 @@ class CachedLLM:
 # -------------------------------------------------------------------- factory
 
 
+def default_backend() -> str:
+    """`anthropic` when an API key is set, else `agent` (the Claude Code login)."""
+    return "anthropic" if os.environ.get("ANTHROPIC_API_KEY") else "agent"
+
+
 def get_llm(role: Literal["main", "judge"] = "main") -> LLM:
-    """Backend selected by JC_LLM (mock | anthropic), cached unless JC_CACHE=0."""
-    backend = os.environ.get("JC_LLM", "anthropic")
+    """Backend selected by JC_LLM (mock | agent | anthropic), cached unless JC_CACHE=0."""
+    backend = os.environ.get("JC_LLM") or default_backend()
     if backend == "mock":
         return MockLLM()
     if backend == "anthropic":
         llm: LLM = AnthropicLLM(resolve_model(role))
-        if os.environ.get("JC_CACHE", "1") != "0":
-            llm = CachedLLM(llm)
-        return llm
-    raise ValueError(f"JC_LLM must be 'mock' or 'anthropic', got {backend!r}")
+    elif backend == "agent":
+        llm = ClaudeAgentLLM(resolve_model(role))
+    else:
+        raise ValueError(f"JC_LLM must be 'mock', 'agent' or 'anthropic', got {backend!r}")
+    if os.environ.get("JC_CACHE", "1") != "0":
+        llm = CachedLLM(llm)
+    return llm

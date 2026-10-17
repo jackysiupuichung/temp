@@ -102,6 +102,21 @@ def ingest(
     _guarded(go)
 
 
+@app.command(name="cards-from-summaries")
+def cards_from_summaries(
+    summary_dir: Annotated[Path, typer.Argument(help="Directory of executive-summary *.md files.", show_default=False)],
+    cards_dir: CardsDir,
+) -> None:
+    """Parse templated summaries into PaperCard JSON files; no LLM call."""
+    from journal_club.summaries import write_cards_from_summaries
+
+    def go() -> None:
+        paths = write_cards_from_summaries(summary_dir, cards_dir)
+        typer.echo(f"{len(paths)} cards -> {cards_dir}")
+
+    _guarded(go)
+
+
 @app.command()
 def run(cards_dir: CardsDir, out: Out, agenda: Agenda, resume: Resume = False) -> None:
     """Run one night (map -> debate -> directions) on CARDS_DIR and write minutes.md."""
