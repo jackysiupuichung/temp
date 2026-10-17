@@ -1,3 +1,7 @@
 research/papers/**/*.pdf
-!research/papers/desi_before_T/*.pdf
 .DS_Store
+.jc_cache/
+runs/
+.venv/
+__pycache__/
+.pytest_cache/
