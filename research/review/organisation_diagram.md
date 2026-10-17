@@ -40,6 +40,30 @@ flowchart LR
 
 Three rounds overnight. Round 1 has an empty archive, so the students write from their paper and the agenda alone. Rounds 2 and 3 start from the archive.
 
+## The self-improvement, spelled out
+
+The green arrow in the schematic (archive → students) is the whole point. It carries four things, and each maps to a mechanism the review found in systems that actually compound ([rsi.md](rsi.md) §b):
+
+| Ingredient | In the loop | Borrowed from | Without it |
+| --- | --- | --- | --- |
+| 1. Never discard | Every note stays in `events.jsonl` with its score | Darwin Gödel Machine archive; ADAS | Round 2 repeats round 1 |
+| 2. Select | Each student reads the 4 best-scored notes before writing | DGM parent sampling; AlphaEvolve program database | Everyone writes about everything; no direction |
+| 3. Feedback | The PI's one weak-spot line is prepended to every prompt | AI co-scientist meta-review digest | Scores go up and down; nothing is learned from them |
+| 4. External check | The PI searches the literature for the top idea each round | Every compounding system has a hard evaluator | The loop drifts toward what the PI's model likes (Huang et al.; Moltbook trilemma) |
+
+Without 1-3 it is a pipeline. Without 4 it is a mirror.
+
+### Round by round
+
+| | Round 1: cold | Round 2: warm | Round 3: focused |
+| --- | --- | --- | --- |
+| Reads | The paper + your agenda | 4 best notes + PI's line | 4 best notes + PI's line |
+| Archive | 0 → 8 notes | 8 → 16 | 16 → 24 |
+| Expect | Mostly claims; critiques generic ("sample is small"); ideas pair obvious neighbours | Critiques quote and target the weak spot; students answer round-1 critiques of their paper; ideas build on scored ones | Ideas are falsifiable and cite two passages; top idea has a literature verdict; duplicates gone |
+| PI's line, e.g. | "critiques did not quote the passage they attack" | "ideas do not say what result would falsify them" | stop here |
+
+**Measure it, do not assume it.** Log per round the share of quotes that string-match the source and the mean PI score. If neither rises, say "rounds change", not "rounds get better". Gains from an LLM scorer flatten after 3-4 rounds ([rsi.md](rsi.md) §c), which is why the night stops at three.
+
 ## What this loop gives you for free
 
 - **Disputes**: a critique note that scores high *is* a dispute; the PI's score is the verdict.

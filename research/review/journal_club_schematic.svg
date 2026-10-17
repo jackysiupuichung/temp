@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" width="1000" height="520" font-family="Helvetica, Arial, sans-serif">
-  <title>Library Journal Club — the loop</title>
-  <desc>The simplest self-improving loop. You set the agenda. Eight PhD-student agents, one per paper, each write one note. The PI scores the notes. Everything goes into an archive with its score. The next round starts by reading the best of the archive. Three rounds overnight, then you read the minutes.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 770" width="1000" height="770" font-family="Helvetica, Arial, sans-serif">
+  <title>Library Journal Club — the self-improving loop</title>
+  <desc>Eight PhD-student agents, one per paper, each write a note. The PI scores the notes, checks quotes, searches the literature for the top idea, and writes one weak-spot line. Everything goes into an archive. The highlighted feedback arrow is what makes the loop self-improving: the next round starts from the best notes and the weak-spot line. A callout explains the four ingredients of self-improvement, and a band at the bottom shows what changes across three rounds.</desc>
   <style>
     .t { font-size: 12.5px; fill: #1f2937; }
     .ts { font-size: 11px; fill: #4b5563; }
@@ -11,82 +11,140 @@
     .pi { fill: #f8cecc; stroke: #b85450; stroke-width: 1.5; }
     .students { fill: #dae8fc; stroke: #6c8ebf; stroke-width: 1.5; }
     .archive { fill: #fff2cc; stroke: #d6b656; stroke-width: 1.5; }
+    .callout { fill: #e8f5e9; stroke: #2e7d32; stroke-width: 1.5; }
+    .round { fill: #ffffff; stroke: #9ca3af; stroke-width: 1.2; }
+    .band { fill: none; stroke: #6b7280; stroke-width: 1.2; stroke-dasharray: 5 4; }
     .edge { fill: none; stroke: #374151; stroke-width: 2; }
+    .rsi { fill: none; stroke: #2e7d32; stroke-width: 4; }
+    .rsit { fill: #2e7d32; font-weight: 700; font-size: 12.5px; }
+    .rsih { fill: #1b5e20; font-weight: 700; font-size: 13px; }
     .num { fill: #111827; }
+    .numg { fill: #2e7d32; }
     .numt { font-size: 10px; font-weight: 700; fill: #ffffff; }
   </style>
   <defs>
-    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0 0L10 5L0 10z" fill="#374151"/>
-    </marker>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#374151"/></marker>
+    <marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2e7d32"/></marker>
     <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 2h6v2h-1v5l6 10a2 2 0 0 1-1.7 3H5.7A2 2 0 0 1 4 19l6-10V4H9z"/></symbol>
     <symbol id="i-gavel" viewBox="0 0 24 24"><rect x="2" y="19" width="10" height="3" rx="1"/><rect x="5" y="9" width="12" height="4" rx="1" transform="rotate(-45 11 11)"/><rect x="12" y="1" width="5" height="9" rx="1" transform="rotate(-45 14.5 5.5)"/></symbol>
     <symbol id="i-docs" viewBox="0 0 24 24"><path d="M8 5h8l4 4v12H8z" stroke-width="1.6"/><path d="M4 2h8v3H8v14H4z" stroke-width="1.6"/><path d="M11 13h6M11 16h6" fill="none" stroke-width="1.6"/></symbol>
     <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5" fill="none" stroke-width="2"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" fill="none" stroke-width="2"/></symbol>
+    <symbol id="i-cycle" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7" fill="none" stroke-width="2.6" stroke-linecap="round"/><path d="M20 3v5h-5" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   </defs>
 
-  <rect x="0" y="0" width="1000" height="520" fill="#ffffff"/>
+  <rect x="0" y="0" width="1000" height="770" fill="#ffffff"/>
 
-  <text x="30" y="36" class="title">Library Journal Club — the loop</text>
-  <text x="30" y="56" class="sub">One round = read the archive → write a note → PI scores → keep everything. Run it three times overnight.</text>
+  <text x="30" y="36" class="title">Library Journal Club — the self-improving loop</text>
+  <text x="30" y="56" class="sub">One round = read the archive → write a note → PI scores → keep everything. The green arrow is what makes round 2 better than round 1.</text>
 
   <!-- You -->
-  <rect x="30" y="200" width="170" height="80" rx="8" class="you"/>
-  <use href="#i-flask" x="42" y="222" width="30" height="30" fill="#d79b00"/>
-  <text x="82" y="232" class="tb">You</text>
-  <text x="82" y="249" class="ts">set the agenda at 10 pm</text>
-  <text x="82" y="263" class="ts">read the minutes at 8 am</text>
+  <rect x="30" y="205" width="170" height="80" rx="8" class="you"/>
+  <use href="#i-flask" x="42" y="227" width="30" height="30" fill="#d79b00"/>
+  <text x="82" y="237" class="tb">You</text>
+  <text x="82" y="254" class="ts">set the agenda at 10 pm</text>
+  <text x="82" y="268" class="ts">read the minutes at 8 am</text>
 
   <!-- Students -->
-  <rect x="290" y="110" width="260" height="90" rx="8" class="students"/>
-  <use href="#i-docs" x="302" y="134" width="34" height="34" fill="#ffffff" stroke="#6c8ebf"/>
-  <text x="348" y="140" class="tb">8 PhD students</text>
-  <text x="348" y="157" class="ts">one per paper in your library</text>
-  <text x="348" y="171" class="ts">each writes one note per round:</text>
-  <text x="348" y="185" class="ts">a claim, a critique, or an idea</text>
+  <rect x="290" y="100" width="260" height="104" rx="8" class="students"/>
+  <use href="#i-docs" x="302" y="130" width="34" height="34" fill="#ffffff" stroke="#6c8ebf"/>
+  <text x="348" y="128" class="tb">8 PhD students</text>
+  <text x="348" y="145" class="ts">one per paper in your library</text>
+  <text x="348" y="159" class="ts">each writes one note per round:</text>
+  <text x="348" y="173" class="ts">a claim, a critique, or an idea:</text>
+  <text x="348" y="187" class="ts">"X's method on Y's data would test Z"</text>
 
   <!-- PI -->
-  <rect x="700" y="110" width="260" height="90" rx="8" class="pi"/>
-  <use href="#i-gavel" x="712" y="134" width="34" height="34" fill="#b85450"/>
-  <text x="758" y="140" class="tb">PI</text>
-  <text x="758" y="157" class="ts">scores every note 1–5</text>
-  <text x="758" y="171" class="ts">checks the quotes exist in the source</text>
-  <text x="758" y="185" class="ts">one line: what was weak this round</text>
+  <rect x="700" y="100" width="270" height="104" rx="8" class="pi"/>
+  <use href="#i-gavel" x="712" y="130" width="34" height="34" fill="#b85450"/>
+  <text x="758" y="128" class="tb">PI</text>
+  <text x="758" y="145" class="ts">scores notes 1–5; checks the quotes exist</text>
+  <text x="758" y="159" class="ts">searches the literature for the top idea:</text>
+  <text x="758" y="173" class="ts">new / already published</text>
+  <text x="758" y="187" class="ts">writes one line: what was weak this round</text>
 
   <!-- Archive -->
-  <rect x="495" y="330" width="260" height="90" rx="8" class="archive"/>
-  <use href="#i-db" x="507" y="354" width="34" height="34" fill="#d6b656" stroke="#d6b656"/>
-  <text x="553" y="360" class="tb">Archive</text>
-  <text x="553" y="377" class="ts">every note, with its score</text>
-  <text x="553" y="391" class="ts">never deleted</text>
-  <text x="553" y="405" class="ts">minutes + Zotero notes are read from it</text>
+  <rect x="495" y="345" width="260" height="90" rx="8" class="archive"/>
+  <use href="#i-db" x="507" y="369" width="34" height="34" fill="#d6b656" stroke="#d6b656"/>
+  <text x="553" y="375" class="tb">Archive</text>
+  <text x="553" y="392" class="ts">every note + its score + the PI's line</text>
+  <text x="553" y="406" class="ts">never deleted: 8 → 16 → 24 notes</text>
+  <text x="553" y="420" class="ts">minutes + Zotero notes are read from it</text>
 
   <!-- 0 You -> students -->
-  <path d="M200 240H250V155H290" class="edge" marker-end="url(#ah)"/>
-  <text x="206" y="232" class="ts">agenda</text>
+  <path d="M200 245H250V152H290" class="edge" marker-end="url(#ah)"/>
+  <text x="206" y="237" class="ts">agenda</text>
 
   <!-- 1 students -> PI -->
-  <path d="M550 155H700" class="edge" marker-end="url(#ah)"/>
-  <circle cx="625" cy="155" r="10" class="num"/><text x="625" y="159" class="numt" text-anchor="middle">1</text>
-  <text x="625" y="140" class="t" text-anchor="middle">8 notes</text>
+  <path d="M550 152H700" class="edge" marker-end="url(#ah)"/>
+  <circle cx="625" cy="152" r="10" class="num"/><text x="625" y="156" class="numt" text-anchor="middle">1</text>
+  <text x="625" y="137" class="t" text-anchor="middle">8 notes</text>
 
   <!-- 2 PI -> archive -->
-  <path d="M830 200V375H755" class="edge" marker-end="url(#ah)"/>
-  <circle cx="830" cy="290" r="10" class="num"/><text x="830" y="294" class="numt" text-anchor="middle">2</text>
-  <text x="814" y="294" class="t" text-anchor="end">notes + scores + weak-spot line</text>
+  <path d="M835 204V390H755" class="edge" marker-end="url(#ah)"/>
+  <circle cx="835" cy="300" r="10" class="num"/><text x="835" y="304" class="numt" text-anchor="middle">2</text>
+  <text x="851" y="304" class="t">notes + scores</text>
+  <text x="851" y="319" class="t">+ weak-spot line</text>
 
-  <!-- 3 archive -> students -->
-  <path d="M495 375H420V200" class="edge" marker-end="url(#ah)"/>
-  <circle cx="420" cy="290" r="10" class="num"/><text x="420" y="294" class="numt" text-anchor="middle">3</text>
-  <text x="404" y="294" class="t" text-anchor="end">next round: each student reads</text>
-  <text x="404" y="309" class="t" text-anchor="end">the 4 best notes + the weak-spot line</text>
+  <!-- 3 RSI: archive -> students (highlighted) -->
+  <path d="M495 390H420V204" class="rsi" marker-end="url(#ahg)"/>
+  <circle cx="420" cy="300" r="10" class="numg"/><text x="420" y="304" class="numt" text-anchor="middle">3</text>
+  <text x="404" y="296" class="rsit" text-anchor="end">RSI: next round reads</text>
+  <text x="404" y="311" class="t" text-anchor="end">the 4 best notes</text>
+  <text x="404" y="326" class="t" text-anchor="end">+ the weak-spot line</text>
+
+  <!-- callout inside the loop -->
+  <rect x="470" y="222" width="330" height="108" rx="6" class="callout"/>
+  <use href="#i-cycle" x="480" y="232" width="20" height="20" fill="none" stroke="#2e7d32"/>
+  <text x="506" y="247" class="rsih">Why it improves itself (× 3 rounds)</text>
+  <text x="480" y="266" class="ts">1. never discard: the archive is the memory (DGM)</text>
+  <text x="480" y="281" class="ts">2. select: the 4 best notes start the next round</text>
+  <text x="480" y="296" class="ts">3. feedback: the PI's weak-spot line says what to fix</text>
+  <text x="480" y="311" class="ts">4. external check: literature search stops self-deception</text>
+  <text x="480" y="325" class="ts" font-style="italic">without 1–3: a pipeline; without 4: drift to the PI's taste</text>
 
   <!-- 4 archive -> you -->
-  <path d="M625 420V460H115V280" class="edge" marker-end="url(#ah)"/>
-  <circle cx="370" cy="460" r="10" class="num"/><text x="370" y="464" class="numt" text-anchor="middle">4</text>
-  <text x="386" y="453" class="t">after round 3: minutes + Zotero notes</text>
+  <path d="M625 435V470H115V285" class="edge" marker-end="url(#ah)"/>
+  <circle cx="370" cy="470" r="10" class="num"/><text x="370" y="474" class="numt" text-anchor="middle">4</text>
+  <text x="386" y="463" class="t">after round 3: minutes + Zotero notes</text>
 
-  <!-- loop label -->
-  <text x="625" y="262" class="tb" text-anchor="middle">× 3 rounds</text>
-  <text x="625" y="279" class="ts" text-anchor="middle">~12 calls per round, ~40 for the night</text>
+  <!-- Bottom band: what changes across rounds -->
+  <rect x="30" y="505" width="940" height="245" rx="6" class="band"/>
+  <text x="42" y="523" class="rsih">What the archive does to the notes, round by round</text>
+
+  <rect x="45" y="535" width="295" height="160" rx="6" class="round"/>
+  <text x="57" y="555" class="tb">Round 1 · cold</text>
+  <text x="57" y="573" class="ts">reads: the paper + your agenda only</text>
+  <text x="57" y="588" class="ts">archive: empty → 8 notes</text>
+  <text x="57" y="610" class="t">Expect: mostly claims; critiques are generic</text>
+  <text x="57" y="625" class="t">("sample is small"); ideas pair the obvious</text>
+  <text x="57" y="640" class="t">neighbours.</text>
+  <text x="57" y="662" class="ts">PI's line, e.g. "critiques did not quote the</text>
+  <text x="57" y="676" class="ts">passage they attack"</text>
+
+  <path d="M340 615H355" class="rsi" marker-end="url(#ahg)"/>
+
+  <rect x="355" y="535" width="295" height="160" rx="6" class="round"/>
+  <text x="367" y="555" class="tb">Round 2 · warm</text>
+  <text x="367" y="573" class="ts">reads: 4 best notes + PI's line</text>
+  <text x="367" y="588" class="ts">archive: 8 → 16 notes</text>
+  <text x="367" y="610" class="t">Expect: critiques now quote and target the</text>
+  <text x="367" y="625" class="t">weak spot; students answer round-1 critiques</text>
+  <text x="367" y="640" class="t">of their paper; ideas build on scored ones.</text>
+  <text x="367" y="662" class="ts">PI's line, e.g. "ideas do not say what result</text>
+  <text x="367" y="676" class="ts">would falsify them"</text>
+
+  <path d="M650 615H665" class="rsi" marker-end="url(#ahg)"/>
+
+  <rect x="665" y="535" width="295" height="160" rx="6" class="round"/>
+  <text x="677" y="555" class="tb">Round 3 · focused</text>
+  <text x="677" y="573" class="ts">reads: 4 best notes + PI's line</text>
+  <text x="677" y="588" class="ts">archive: 16 → 24 notes</text>
+  <text x="677" y="610" class="t">Expect: ideas are falsifiable and cite two</text>
+  <text x="677" y="625" class="t">passages; the top idea has a literature</text>
+  <text x="677" y="640" class="t">verdict; duplicates have dropped out.</text>
+  <text x="677" y="662" class="ts">Stop here: with an LLM scorer, gains flatten</text>
+  <text x="677" y="676" class="ts">after 3–4 rounds (Du et al.; rsi.md §c)</text>
+
+  <text x="42" y="722" class="ts">Measure it, do not assume it: log per round the share of quotes that string-match the source, and the mean PI score.</text>
+  <text x="42" y="738" class="ts">If neither rises, say "rounds change", not "rounds get better". ~12 calls per round, ~40 for the night. Outputs are candidate hypotheses.</text>
 </svg>
