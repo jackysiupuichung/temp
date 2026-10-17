@@ -72,7 +72,7 @@ function createCard(askId: string, cap: Capture, description: ScreenDescription)
     id: newId(), docId: doc.id, pageId, x: rect.x, y: rect.y, width: rect.width, height: 44,
     text: '', fontSize: ANSWER_FONT_SIZE, color: '#18181b', kind: 'answer', format: 'markdown',
     answer: {
-      askId, description, status: 'answering', anchorRect: placement?.anchorRect ?? { x: rect.x, y: rect.y, width: 0, height: 0 },
+      askId, description, status: 'answering', askedAt: Date.now(), anchorRect: placement?.anchorRect ?? { x: rect.x, y: rect.y, width: 0, height: 0 },
       collapsed: false, maxHeight: placement?.maxHeight ?? CARD_EST_HEIGHT, floating: placement?.floating ?? false,
     },
   };
@@ -133,11 +133,11 @@ function attachAskHandlers(askId: string, cap: Capture | null, existingCardId: s
         if (raf) cancelAnimationFrame(raf);
         flush();
         if (cardId) {
-          patchAnswer(cardId, { status: 'done', costUsd: m.costUsd, error: undefined });
+          patchAnswer(cardId, { status: 'done', sessionId: m.sessionId, error: undefined });
           if (!existingCardId) useEditorStore.getState().recordTextBox(cardId, 'Ask');
         }
         useEditorStore.getState().setAgentSession(m.sessionId);
-        useAgentStore.setState({ lastCostUsd: m.costUsd, indicator: null });
+        useAgentStore.setState({ indicator: null });
         off();
         break;
       }
@@ -164,6 +164,7 @@ function docForAsk(): DocumentRecord {
 async function sendAsk(askId: string, cap: Capture, existingCardId: string | null): Promise<void> {
   const doc = docForAsk();
   const agent = useAgentStore.getState();
+  agent.setNotice(null); // an Ask after "New conversation" makes it final
   agent.setIndicator({ askId, text: 'Reading the page…', canCancel: true });
   attachAskHandlers(askId, cap, existingCardId);
   try {
@@ -222,6 +223,7 @@ export async function reAsk(cardId: string, description: ScreenDescription): Pro
   if (old) captures.set(askId, old);
   cardByAsk.set(askId, cardId);
   patchAnswer(cardId, { askId, description, status: 'answering', error: undefined }, '');
+  useAgentStore.getState().setNotice(null);
   attachAskHandlers(askId, old ?? null, cardId);
   try {
     await client.ensureConnected();
@@ -246,11 +248,32 @@ export function cancelAsk(askId: string): void {
   if (ind?.askId === askId) useAgentStore.getState().setIndicator(null);
 }
 
-/** "New conversation": the next Ask starts a fresh agent session for this document. */
+/** "New conversation": the next Ask starts a fresh agent session for this document. Undoable from the notice until the next Ask. */
 export function newConversation(): void {
-  useEditorStore.getState().setAgentSession(null);
-  useAgentStore.setState({ lastCostUsd: null });
+  const st = useEditorStore.getState();
+  const docId = st.doc?.id;
+  const prev = st.doc?.agentSessionId ?? null;
+  st.setAgentSession(null);
+  if (!prev) return;
+  useAgentStore.getState().setNotice({
+    text: 'New conversation: the next Ask starts fresh.',
+    undo: () => {
+      const cur = useEditorStore.getState();
+      if (cur.doc?.id !== docId || cur.doc?.agentSessionId) return; // another document, or an Ask already started a session
+      cur.setAgentSession(prev);
+    },
+  });
 }
 
-export const askApi = { ask, retryAsk, reAsk, cancelAsk, newConversation, ensurePdfSynced, summariseHandwriting };
+/** Scroll to an answer card and flash it (from the conversation panel). */
+export function showCard(cardId: string): void {
+  const st = useEditorStore.getState();
+  const card = findCard(cardId);
+  const index = card ? st.doc?.pages.findIndex((p) => p.id === card.pageId) ?? -1 : -1;
+  if (!card || index < 0) return;
+  st.requestJumpToPage(index, { x: card.x, y: card.y, width: card.width });
+  useAgentStore.getState().flashCard(cardId);
+}
+
+export const askApi = { ask, retryAsk, reAsk, cancelAsk, newConversation, showCard, ensurePdfSynced, summariseHandwriting };
 export { summariseHandwriting };

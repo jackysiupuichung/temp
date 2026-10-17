@@ -7,7 +7,6 @@ export function AgentSettingsModal({ onClose }: { onClose: () => void }) {
   const status = useAgentStore((s) => s.status);
   const serverInfo = useAgentStore((s) => s.serverInfo);
   const lastError = useAgentStore((s) => s.lastError);
-  const lastCostUsd = useAgentStore((s) => s.lastCostUsd);
   const saveSettings = useAgentStore((s) => s.saveSettings);
   const [url, setUrl] = useState(settings.url || defaultServerUrl());
   const [token, setToken] = useState(settings.token);
@@ -39,7 +38,6 @@ export function AgentSettingsModal({ onClose }: { onClose: () => void }) {
           Status: {testing ? 'connecting…' : status}
           {serverInfo && <> · server {serverInfo.serverVersion}{serverInfo.mock ? ' (mock)' : ''} · vision {serverInfo.models.vision} · agent {serverInfo.models.agent}</>}
           {lastError && <span style={{ color: 'var(--danger)' }}> · {lastError}</span>}
-          {lastCostUsd != null && <> · conversation cost ${lastCostUsd.toFixed(3)}</>}
         </div>
         <div className="actions">
           <button className="btn" onClick={onClose}>Close</button>

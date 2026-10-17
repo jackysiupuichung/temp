@@ -11,6 +11,13 @@ export type ConnStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
 export type ServerInfo = { serverVersion: string; mock: boolean; models: { vision: string; agent: string } };
 
 export type Indicator = { askId: string; text: string; error?: string; canRetry?: boolean; canCancel?: boolean };
+/** A short message at the bottom of the screen, optionally with Undo (e.g. after "New conversation"). */
+export type Notice = { text: string; undo?: () => void };
+
+const NOTICE_MS = 8000;
+const FLASH_MS = 1600;
+let noticeTimer: ReturnType<typeof setTimeout> | undefined;
+let flashTimer: ReturnType<typeof setTimeout> | undefined;
 
 export type AgentState = {
   settings: AgentSettings;
@@ -19,13 +26,19 @@ export type AgentState = {
   serverInfo: ServerInfo | null;
   lastError: string | null;
   indicator: Indicator | null;
-  /** Running conversation cost reported by the last answer_done (shown in debug). */
-  lastCostUsd: number | null;
   settingsOpen: boolean;
+  /** The conversation panel beside the pages. */
+  conversationOpen: boolean;
+  notice: Notice | null;
+  /** An answer card briefly highlighted after jumping to it. */
+  flashCardId: string | null;
   loadSettings(): Promise<void>;
   saveSettings(s: AgentSettings): Promise<void>;
   setIndicator(i: Indicator | null): void;
   setSettingsOpen(v: boolean): void;
+  setConversationOpen(v: boolean): void;
+  setNotice(n: Notice | null): void;
+  flashCard(id: string): void;
 };
 
 export function defaultServerUrl(): string {
@@ -41,8 +54,10 @@ export const useAgentStore = create<AgentState>((set) => ({
   serverInfo: null,
   lastError: null,
   indicator: null,
-  lastCostUsd: null,
   settingsOpen: false,
+  conversationOpen: false,
+  notice: null,
+  flashCardId: null,
   async loadSettings() {
     const s = await getSetting<AgentSettings>('agentServer');
     set({ settings: { url: s?.url || defaultServerUrl(), token: s?.token ?? '' }, settingsLoaded: true });
@@ -54,6 +69,17 @@ export const useAgentStore = create<AgentState>((set) => ({
   },
   setIndicator(indicator) { set({ indicator }); },
   setSettingsOpen(settingsOpen) { set({ settingsOpen }); },
+  setConversationOpen(conversationOpen) { set({ conversationOpen }); },
+  setNotice(notice) {
+    clearTimeout(noticeTimer);
+    set({ notice });
+    if (notice) noticeTimer = setTimeout(() => set({ notice: null }), NOTICE_MS);
+  },
+  flashCard(flashCardId) {
+    clearTimeout(flashTimer);
+    set({ flashCardId });
+    flashTimer = setTimeout(() => set({ flashCardId: null }), FLASH_MS);
+  },
 }));
 
 type Listener = (m: ServerMessage) => void;

@@ -174,7 +174,15 @@ export function Viewer() {
     if (!jumpToPage) return;
     const el = scrollerRef.current!;
     const p = layoutRef.current.pages[jumpToPage.index];
-    if (p) el.scrollTo({ top: Math.max(0, p.y - PAGE_GAP / 2), behavior: 'auto' });
+    if (!p) return;
+    const t = jumpToPage.target, z = zoomRef.current;
+    if (!t) { el.scrollTo({ top: Math.max(0, p.y - PAGE_GAP / 2), behavior: 'auto' }); return; }
+    // Bring the box in horizontally only if it isn't already fully visible.
+    const x0 = p.x + t.x * z, x1 = p.x + (t.x + t.width) * z;
+    let left = el.scrollLeft;
+    if (x1 > left + el.clientWidth) left = x1 - el.clientWidth + 16;
+    if (x0 < left) left = x0 - 16;
+    el.scrollTo({ top: Math.max(0, p.y + t.y * z - 80), left: Math.max(0, left), behavior: 'auto' });
   }, [jumpToPage]);
 
   // Current page + persisted view state (debounced).

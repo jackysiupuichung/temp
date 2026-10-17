@@ -73,6 +73,7 @@ async function describeWithAgentSdk(input: VisionInput, cfg: Config, signal: Abo
     prompt: prompt(),
     options: {
       systemPrompt: VISION_SYSTEM_PROMPT, model: cfg.visionModel, tools: [], settingSources: [], maxTurns: 2,
+      mcpServers: {}, strictMcpConfig: true, settings: { disableClaudeAiConnectors: true },
       thinking: { type: 'disabled' }, abortController: abort, persistSession: false,
       outputFormat: { type: 'json_schema', schema: SCREEN_DESCRIPTION_JSON_SCHEMA as unknown as Record<string, unknown> },
     },

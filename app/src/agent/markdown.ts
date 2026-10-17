@@ -98,6 +98,11 @@ export function renderMarkdown(src: string): string {
   return html;
 }
 
+/** One line of text with inline maths: `$…$` (and `$$…$$`, set inline) through KaTeX, the rest escaped. No Markdown. */
+export function renderInlineMath(src: string): string {
+  return splitMath(src).map((s) => (s.kind === 'text' ? escapeHtml(s.text) : renderTex(s.tex, false))).join('');
+}
+
 /** Plain-text approximation of an answer (for export and the collapsed card): maths kept as its source. */
 export function markdownToPlainText(src: string): string {
   return src

@@ -3,6 +3,7 @@ import { useEditorStore } from '../store/editorStore';
 import { Toolbar } from './Toolbar';
 import { Viewer } from './Viewer';
 import { ThumbnailSidebar } from './ThumbnailSidebar';
+import { ConversationPanel } from './ConversationPanel';
 import { inputState } from './inputState';
 import { releasePdf } from '../pdf/pdf';
 import { persister } from '../persist/persist';
@@ -18,6 +19,7 @@ export function Editor({ docId, onBack }: { docId: string; onBack: () => void })
   const openDocument = useEditorStore((s) => s.openDocument);
   const closeDocument = useEditorStore((s) => s.closeDocument);
   const renameDoc = useEditorStore((s) => s.renameDoc);
+  const conversationOpen = useAgentStore((s) => s.conversationOpen);
 
   useEffect(() => {
     void openDocument(docId);
@@ -78,6 +80,7 @@ export function Editor({ docId, onBack }: { docId: string; onBack: () => void })
       <div className="editor-body">
         {sidebarOpen && <ThumbnailSidebar />}
         <Viewer />
+        {conversationOpen && <ConversationPanel />}
       </div>
     </div>
   );

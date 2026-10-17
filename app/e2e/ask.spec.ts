@@ -75,7 +75,7 @@ test('write → Ask → one card placed near the ink, answer streamed, undo remo
   await expect(page.getByTestId('ask-indicator')).toHaveCount(0);
 
   // the session id was stored on the document
-  expect(await page.evaluate(() => (window as unknown as { __notebook: NB }).__notebook.store.getState().doc.agentSessionId)).toBe('mock-session-' + (await page.evaluate(() => (window as unknown as { __notebook: NB }).__notebook.store.getState().doc.id)));
+  expect(await page.evaluate(() => (window as unknown as { __notebook: NB }).__notebook.store.getState().doc.agentSessionId)).toMatch(new RegExp('^mock-session-' + (await page.evaluate(() => (window as unknown as { __notebook: NB }).__notebook.store.getState().doc.id)) + '-\\d+$'));
 
   // undo removes the card in one step (streaming did not flood the stack)
   await page.keyboard.press('Meta+z');
@@ -104,4 +104,67 @@ test('a wrong pairing token shows an error with Retry and Settings', async ({ pa
   await expect(page.getByRole('dialog', { name: 'Assistant server' })).toBeVisible();
   await expect(page.getByTestId('agent-status')).toContainText('error');
   expect(await answerCards(page)).toHaveLength(0);
+});
+
+test('conversation chip, undoable New conversation, and the conversation panel', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Blank notebook' }).click();
+  await page.getByRole('button', { name: /Open Untitled notebook/ }).first().click();
+  await expect(page.locator('.page[data-page-index="0"]')).toBeVisible();
+  await page.evaluate(({ url, token }) => (window as unknown as { __notebook: NB }).__notebook.agent.getState().saveSettings({ url, token }), { url: MOCK_URL, token: MOCK_TOKEN });
+  const sessionId = () => page.evaluate(() => (window as unknown as { __notebook: NB }).__notebook.store.getState().doc.agentSessionId as string | null);
+  const pageErrors: string[] = [];
+  page.on('pageerror', (e) => pageErrors.push(e.message));
+  const askAndWait = async (n: number) => {
+    await page.getByTestId('ask-btn').click();
+    await expect.poll(async () => (await answerCards(page)).filter((c) => c.answer?.status === 'done').length, { timeout: 20_000 }).toBe(n);
+  };
+
+  // no conversation yet: no chip
+  await expect(page.getByTestId('conversation-chip')).toHaveCount(0);
+  await askAndWait(1);
+  const chip = page.getByTestId('conversation-chip');
+  await expect(chip).toHaveText(/^1 ask$/);
+  const first = await sessionId();
+
+  // New conversation from the chip, then Undo restores the same session
+  await chip.click();
+  await expect(page.getByRole('dialog').getByRole('heading', { name: 'This conversation' })).toBeVisible();
+  await page.getByTestId('new-conversation').click();
+  expect(await sessionId()).toBeNull();
+  await expect(chip).toHaveCount(0);
+  const notice = page.getByTestId('notice');
+  await expect(notice).toContainText('New conversation');
+  await notice.getByRole('button', { name: 'Undo' }).click();
+  expect(await sessionId()).toBe(first);
+  await expect(page.getByTestId('conversation-chip')).toHaveText(/^1 ask/);
+
+  // a second ask continues it; then a real reset and a third ask starts another conversation
+  await askAndWait(2);
+  await expect(page.getByTestId('conversation-chip')).toHaveText(/^2 asks/);
+  await page.getByTestId('conversation-chip').click();
+  await page.getByTestId('new-conversation').click();
+  await askAndWait(3);
+  expect(await sessionId()).not.toBe(first);
+  await expect(page.getByTestId('notice')).toHaveCount(0); // asking makes the reset final
+  await expect(page.getByTestId('conversation-chip')).toHaveText(/^1 ask/);
+
+  // the panel groups the asks by conversation, current first
+  await page.getByTestId('conversation-toggle').click();
+  const panel = page.getByTestId('conversation-panel');
+  await expect(panel.getByRole('region', { name: 'This conversation' }).getByRole('listitem')).toHaveCount(1);
+  await expect(panel.getByRole('region', { name: 'Earlier conversation' }).getByRole('listitem')).toHaveCount(2);
+  await expect(panel.locator('.conversation-entry').first()).toContainText('why');
+
+  // tapping an entry flashes its card
+  await panel.getByRole('region', { name: 'Earlier conversation' }).locator('.conversation-entry').first().click();
+  await expect(page.locator('.answer-card.flash')).toHaveCount(1);
+
+  // the panel's own New button resets too
+  await panel.getByRole('button', { name: 'New' }).click();
+  await expect(panel).toContainText('No conversation yet');
+  await expect(panel.getByRole('region', { name: 'This conversation' })).toHaveCount(0);
+  await panel.getByRole('button', { name: 'Close conversation' }).click();
+  await expect(panel).toHaveCount(0);
+  expect(pageErrors).toEqual([]); // e.g. the card's grow-to-fit loop on a zoomed-in blank page
 });

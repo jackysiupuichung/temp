@@ -1,12 +1,15 @@
 /**
  * Paper store (agent design §5.2): PDFs keyed by content hash, with their text
- * extracted page by page using pdf.js in Node.
+ * extracted page by page using pdf.js in Node. Each page's text is also written
+ * to its own file (`<sha>/p001.txt`, …) for the agent's Read/Grep tools.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 
-export type Paper = { sha256: string; pdfPath: string; bytes: number; pageCount: number; pages: string[] };
+export type Paper = { sha256: string; pdfPath: string; pageDir: string; bytes: number; pageCount: number; pages: string[] };
+
+export function pageFileName(page: number): string { return `p${String(page).padStart(3, '0')}.txt`; }
 
 type PdfJs = typeof import('pdfjs-dist/legacy/build/pdf.mjs');
 let pdfjsPromise: Promise<PdfJs> | null = null;
@@ -49,13 +52,23 @@ export class PaperStore {
 
   private pdfPath(sha: string) { return path.join(this.dir, `${sha}.pdf`); }
   private textPath(sha: string) { return path.join(this.dir, `${sha}.text.json`); }
+  private pageDir(sha: string) { return path.join(this.dir, sha); }
+
+  /** One text file per page, written once (papers stored before this existed get theirs on first load). */
+  private writePageFiles(sha: string, pages: string[]) {
+    const dir = this.pageDir(sha);
+    if (fs.existsSync(path.join(dir, pageFileName(pages.length || 1)))) return;
+    fs.mkdirSync(dir, { recursive: true });
+    pages.forEach((text, i) => fs.writeFileSync(path.join(dir, pageFileName(i + 1)), `[p. ${i + 1}]\n${text}\n`));
+  }
 
   async get(sha256: string): Promise<Paper | null> {
     const c = this.cache.get(sha256);
     if (c) return c;
     if (!this.has(sha256)) return null;
     const meta = JSON.parse(fs.readFileSync(this.textPath(sha256), 'utf8')) as { pages: string[] };
-    const p: Paper = { sha256, pdfPath: this.pdfPath(sha256), bytes: fs.statSync(this.pdfPath(sha256)).size, pageCount: meta.pages.length, pages: meta.pages };
+    this.writePageFiles(sha256, meta.pages);
+    const p: Paper = { sha256, pdfPath: this.pdfPath(sha256), pageDir: this.pageDir(sha256), bytes: fs.statSync(this.pdfPath(sha256)).size, pageCount: meta.pages.length, pages: meta.pages };
     this.cache.set(sha256, p);
     return p;
   }
@@ -67,7 +80,8 @@ export class PaperStore {
     fs.writeFileSync(this.pdfPath(sha256), bytes);
     const pages = await extractPages(new Uint8Array(bytes));
     fs.writeFileSync(this.textPath(sha256), JSON.stringify({ pages }));
-    const p: Paper = { sha256, pdfPath: this.pdfPath(sha256), bytes: bytes.length, pageCount: pages.length, pages };
+    this.writePageFiles(sha256, pages);
+    const p: Paper = { sha256, pdfPath: this.pdfPath(sha256), pageDir: this.pageDir(sha256), bytes: bytes.length, pageCount: pages.length, pages };
     this.cache.set(sha256, p);
     return p;
   }

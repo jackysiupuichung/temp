@@ -1,10 +1,10 @@
-import { useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { useEditorStore, rememberColor } from '../store/editorStore';
 import { HIGHLIGHTER_WIDTHS, HIGHLIGHT_COLORS, PEN_WIDTHS, PRESET_COLORS, ZOOM_MAX, ZOOM_MIN, type ToolId } from '../model/types';
 import { Popover } from './Popover';
 import {
   IconBack, IconPen, IconHighlighter, IconEraser, IconLasso, IconText, IconHand, IconUndo, IconRedo, IconPages, IconExport, IconMore,
-  IconPlus, IconMinus, IconFitWidth, IconFitPage, IconPaste, IconFinger, IconSpark,
+  IconPlus, IconMinus, IconFitWidth, IconFitPage, IconPaste, IconFinger, IconSpark, IconChat,
 } from './icons';
 import { exportAnnotatedPdf } from '../export/pdfExport';
 import { exportBundle } from '../export/bundle';
@@ -13,6 +13,7 @@ import { downloadBlob, safeFilename } from '../export/download';
 import { ask, cancelAsk, newConversation, retryAsk } from '../agent/ask';
 import { useAgentStore } from '../agent/client';
 import { AgentSettingsModal } from './AgentSettings';
+import { conversationEntries, conversationStats, formatAskTime } from '../agent/conversation';
 
 const TOOLS: { id: ToolId; label: string; key: string; icon: ReactNode }[] = [
   { id: 'pen', label: 'Pen', key: 'P', icon: <IconPen /> },
@@ -69,8 +70,16 @@ export function Toolbar({ onBack, docTitle, onRename }: { onBack: () => void; do
   const agentStatus = useAgentStore((s) => s.status);
   const settingsOpen = useAgentStore((s) => s.settingsOpen);
   const setSettingsOpen = useAgentStore((s) => s.setSettingsOpen);
-  const hasSession = useEditorStore((s) => !!s.doc?.agentSessionId);
-  const [open, setOpen] = useState<null | 'tool' | 'zoom' | 'export' | 'more' | 'page'>(null);
+  const sessionId = useEditorStore((s) => s.doc?.agentSessionId ?? null);
+  const hasSession = !!sessionId;
+  const pages = useEditorStore((s) => s.doc?.pages);
+  const textBoxesByPage = useEditorStore((s) => s.textBoxesByPage);
+  const entries = useMemo(() => (pages ? conversationEntries(pages, textBoxesByPage) : []), [pages, textBoxesByPage]);
+  const stats = useMemo(() => conversationStats(entries, sessionId), [entries, sessionId]);
+  const conversationOpen = useAgentStore((s) => s.conversationOpen);
+  const setConversationOpen = useAgentStore((s) => s.setConversationOpen);
+  const notice = useAgentStore((s) => s.notice);
+  const [open, setOpen] = useState<null | 'tool' | 'zoom' | 'export' | 'more' | 'page' | 'conversation'>(null);
   const [pageInput, setPageInput] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
   const toggle = (k: typeof open) => setOpen((o) => (o === k ? null : k));
@@ -161,6 +170,23 @@ export function Toolbar({ onBack, docTitle, onRename }: { onBack: () => void; do
           <IconSpark />
           <span className="label">Ask</span>
         </button>
+        {hasSession && (
+          <button className="btn conversation-chip" data-popover-anchor aria-expanded={open === 'conversation'} onClick={() => toggle('conversation')} data-testid="conversation-chip"
+            aria-label={`This conversation: ${stats.asks} ${stats.asks === 1 ? 'ask' : 'asks'}`} title="This conversation">
+            {stats.asks} {stats.asks === 1 ? 'ask' : 'asks'}
+          </button>
+        )}
+        <Popover open={open === 'conversation' && hasSession} onClose={() => setOpen(null)}>
+          <h4>This conversation</h4>
+          <div className="conversation-summary">
+            {stats.asks} {stats.asks === 1 ? 'ask' : 'asks'}{stats.startedAt != null && ` · since ${formatAskTime(stats.startedAt)}`}
+          </div>
+          <p className="hint conversation-explain">The assistant remembers the earlier asks in this conversation. A new conversation starts from just the paper.</p>
+          <div className="menu">
+            <button className="btn" onClick={() => { setConversationOpen(true); setOpen(null); }}><IconChat /> Show conversation</button>
+            <button className="btn" onClick={() => { newConversation(); setOpen(null); }} data-testid="new-conversation"><IconPlus /> New conversation</button>
+          </div>
+        </Popover>
         {indicator && (
           <div className={'ask-indicator' + (indicator.error ? ' error' : '')} role="status" data-testid="ask-indicator">
             {indicator.error ? <span>{indicator.error}</span> : <span><span className="spinner" aria-hidden="true" /> {indicator.text}</span>}
@@ -198,6 +224,7 @@ export function Toolbar({ onBack, docTitle, onRename }: { onBack: () => void; do
       <div className="divider" />
       <div className="group">
         <button className="btn icon-btn" aria-pressed={sidebarOpen} onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Toggle page thumbnails" title="Page thumbnails"><IconPages /></button>
+        <button className="btn icon-btn" aria-pressed={conversationOpen} onClick={() => setConversationOpen(!conversationOpen)} aria-label="Toggle conversation" title="Conversation" data-testid="conversation-toggle"><IconChat /></button>
         <button className="btn icon-btn" aria-pressed={fingerDraws} onClick={() => setFingerDraws(!fingerDraws)} aria-label="Draw with finger" title="Draw with finger (one finger draws, two fingers scroll)"><IconFinger /></button>
         <button className="btn icon-btn" data-popover-anchor aria-expanded={open === 'export'} onClick={() => toggle('export')} aria-label="Export" title="Export"><IconExport /></button>
         <Popover open={open === 'export'} onClose={() => setOpen(null)} align="right">
@@ -217,7 +244,12 @@ export function Toolbar({ onBack, docTitle, onRename }: { onBack: () => void; do
           </div>
         </Popover>
       </div>
-      {busy && <div className="toast">{busy}</div>}
+      {busy ? <div className="toast">{busy}</div> : notice && (
+        <div className="toast notice" role="status" data-testid="notice">
+          <span>{notice.text}</span>
+          {notice.undo && <button className="btn mini" onClick={() => { notice.undo!(); useAgentStore.getState().setNotice(null); }}>Undo</button>}
+        </div>
+      )}
       {settingsOpen && <AgentSettingsModal onClose={() => setSettingsOpen(false)} />}
     </div>
   );

@@ -17,7 +17,6 @@ export type Config = {
   visionBackend: 'messages' | 'agent-sdk';
   maxPdfPagesAttached: number;
   maxPdfBytesAttached: number;
-  maxPaperChars: number;
 };
 
 export const SERVER_VERSION = '0.1.0';
@@ -49,7 +48,6 @@ export function loadConfig(): Config {
     visionBackend: (process.env.VISION_BACKEND as Config['visionBackend']) ?? (hasApiKey ? 'messages' : 'agent-sdk'),
     maxPdfPagesAttached: 100,
     maxPdfBytesAttached: 24 * 1024 * 1024,
-    maxPaperChars: 400_000,
   };
 }
 

@@ -29,7 +29,8 @@ export type EditorState = {
   canUndo: boolean;
   canRedo: boolean;
   penActive: boolean; // a pen stroke is in progress (for palm rejection)
-  jumpToPage: { index: number; nonce: number } | null;
+  /** `target`: a box on the page (PDF points) to bring into view, near the top. */
+  jumpToPage: { index: number; target?: { x: number; y: number; width: number }; nonce: number } | null;
   fitRequest: { mode: 'width' | 'page'; nonce: number } | null;
 
   openDocument(id: string): Promise<void>;
@@ -70,7 +71,7 @@ export type EditorState = {
   setZoom(z: number): void;
   setCurrentPageIndex(i: number): void;
   setSidebarOpen(v: boolean): void;
-  requestJumpToPage(index: number): void;
+  requestJumpToPage(index: number, target?: { x: number; y: number; width: number }): void;
   requestFit(mode: 'width' | 'page'): void;
   saveViewState(vs: ViewState): void;
   setPenActive(v: boolean): void;
@@ -524,7 +525,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   setZoom(z) { set({ zoom: clamp(z, ZOOM_MIN, ZOOM_MAX) }); },
   setCurrentPageIndex(i) { if (get().currentPageIndex !== i) set({ currentPageIndex: i }); },
   setSidebarOpen(v) { set({ sidebarOpen: v }); },
-  requestJumpToPage(index) { set({ jumpToPage: { index, nonce: Math.random() } }); },
+  requestJumpToPage(index, target) { set({ jumpToPage: { index, target, nonce: Math.random() } }); },
   requestFit(mode) { set({ fitRequest: { mode, nonce: Math.random() } }); },
   saveViewState(vs) {
     const doc = get().doc;

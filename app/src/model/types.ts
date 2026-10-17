@@ -68,7 +68,9 @@ export type AnswerMeta = {
   /** Largest height the card may grow to in place before its body scrolls (set by placement). */
   maxHeight: number;
   floating?: boolean; // placed over dense text: drawn opaque with a shadow
-  costUsd?: number;
+  /** The agent session that answered; absent on cards made before this was recorded. */
+  sessionId?: string;
+  askedAt?: number; // ms since epoch
 };
 
 /** Output of the vision interpreter (agent design §4.3). */

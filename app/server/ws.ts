@@ -7,7 +7,7 @@ import { PaperStore, type Paper } from './paper';
 import { StateStore } from './state';
 import { describeScreen } from './vision';
 import { runAgentTurn } from './agent';
-import { formatScreen } from './prompt';
+import { formatScreen, type PaperMode } from './prompt';
 import { mockAnswerChunks, mockDescribe } from './mock';
 
 const HELLO_TIMEOUT_MS = 5000;
@@ -27,6 +27,7 @@ export class AgentServer {
   private pendingResolve = new Map<string, (p: Paper | null) => void>();
   /** Serialise agent turns per document: one session can run one turn at a time. */
   private docQueue = new Map<string, Promise<void>>();
+  private mockSessions = 0;
 
   constructor(readonly cfg: Config) {
     this.papers = new PaperStore(cfg.dataDir);
@@ -83,8 +84,7 @@ export class AgentServer {
         paper = await this.papers.put(m.sha256, Buffer.from(m.bytes, 'base64'));
         console.log(`[paper] stored ${m.sha256.slice(0, 12)} (${paper.pageCount} pages, ${Math.round(paper.bytes / 1024)} KB, text ${paper.pages.join('').length} chars) in ${Date.now() - t0} ms`);
       }
-      const prev = this.state.get(m.docId);
-      this.state.update(m.docId, { sha256: m.sha256, pdfReattach: prev.sha256 !== m.sha256 ? true : prev.pdfReattach });
+      this.state.update(m.docId, { sha256: m.sha256 });
       this.pendingResolve.get(m.docId)?.(paper);
       this.pendingResolve.delete(m.docId);
       send({ type: 'pdf_ready', docId: m.docId, sha256: m.sha256, pageCount: paper.pageCount, textChars: paper.pages.join('').length });
@@ -141,6 +141,22 @@ export class AgentServer {
     } finally { asks.delete(m.askId); }
   }
 
+  /**
+   * How this turn gets the paper, so it is in context at most once (agent design §5.2):
+   * - the session already holds this paper's PDF → nothing to attach;
+   * - a new session (or one about a different version of the PDF, which is restarted) → attach the PDF once;
+   * - a session whose PDF was compacted away, an unknown session, or a PDF too big to attach → Read/Grep tools.
+   */
+  private planTurn(docId: string, paper: Paper | null, sessionId: string | null): { mode: PaperMode; attach: boolean; sessionId: string | null } {
+    if (!paper) return { mode: 'none', attach: false, sessionId };
+    const fits = paper.pageCount <= this.cfg.maxPdfPagesAttached && paper.bytes <= this.cfg.maxPdfBytesAttached;
+    const known = sessionId ? this.state.get(docId).sessions[sessionId] : undefined;
+    if (sessionId && known && known.sha256 !== paper.sha256) sessionId = null; // the PDF changed: don't stack two versions in one conversation
+    if (!sessionId) return fits ? { mode: 'pdf', attach: true, sessionId } : { mode: 'tools', attach: false, sessionId };
+    if (known?.pdfInContext) return { mode: 'pdf', attach: false, sessionId };
+    return { mode: 'tools', attach: false, sessionId };
+  }
+
   private answer(askId: string, docId: string, docTitle: string, pageCount: number, description: ScreenDescription, visibleText: Array<{ pageNumber: number; text: string }>, sessionId: string | null, ac: AbortController, send: (m: ServerMessage) => void): Promise<void> {
     const prev = this.docQueue.get(docId) ?? Promise.resolve();
     const run = prev.catch(() => {}).then(() => this.answerNow(askId, docId, docTitle, pageCount, description, visibleText, sessionId, ac, send));
@@ -151,24 +167,22 @@ export class AgentServer {
   private async answerNow(askId: string, docId: string, docTitle: string, pageCount: number, description: ScreenDescription, visibleText: Array<{ pageNumber: number; text: string }>, sessionId: string | null, ac: AbortController, send: (m: ServerMessage) => void): Promise<void> {
     if (ac.signal.aborted) return;
     send({ type: 'status', askId, text: 'Thinking…' });
-    const screenText = formatScreen(description, pageCount, visibleText);
     const t0 = Date.now();
     if (this.cfg.mock) {
       let n = 0;
       for await (const chunk of mockAnswerChunks(ac.signal)) { send({ type: 'answer_delta', askId, text: chunk }); n += chunk.length; }
       if (ac.signal.aborted) return;
-      send({ type: 'answer_done', askId, sessionId: sessionId ?? `mock-session-${docId}`, usage: { inputTokens: 1200, outputTokens: Math.ceil(n / 4), cacheReadTokens: 0, cacheWriteTokens: 0 }, costUsd: 0.0123 });
+      send({ type: 'answer_done', askId, sessionId: sessionId ?? `mock-session-${docId}-${++this.mockSessions}`, usage: { inputTokens: 1200, outputTokens: Math.ceil(n / 4), cacheReadTokens: 0, cacheWriteTokens: 0 }, costUsd: 0.0123 });
       return;
     }
     const paper = await this.paperFor(docId);
-    const st = this.state.get(docId);
-    const fresh = !sessionId;
-    const attach = !!paper && (fresh || st.pdfReattach) && paper.pageCount <= this.cfg.maxPdfPagesAttached && paper.bytes <= this.cfg.maxPdfBytesAttached;
-    const pdfBase64 = attach && paper ? this.papers.readPdfBase64(paper.sha256) : null;
+    const plan = this.planTurn(docId, paper, sessionId);
+    const pdfBase64 = plan.attach && paper ? this.papers.readPdfBase64(paper.sha256) : null;
+    const screenText = formatScreen(description, pageCount, visibleText, plan.mode !== 'pdf');
     let compacted = false;
     let chars = 0;
     const res = await runAgentTurn(
-      { docId, docTitle, sessionId, screenText, paper, pdfBase64, signal: ac.signal },
+      { docId, docTitle, sessionId: plan.sessionId, screenText, paper, mode: plan.mode, pdfBase64, signal: ac.signal },
       this.cfg,
       {
         onDelta: (text) => { chars += text.length; send({ type: 'answer_delta', askId, text }); },
@@ -177,9 +191,9 @@ export class AgentServer {
       },
     );
     if (ac.signal.aborted) return;
-    // After a successful attachment the PDF is in context until the next compaction.
-    this.state.update(docId, { pdfReattach: compacted ? true : attach ? false : st.pdfReattach, sessionIds: Array.from(new Set([...st.sessionIds, res.sessionId])) });
-    console.log(`[ask ${askId.slice(0, 8)}] answered ${chars} chars in ${Date.now() - t0} ms (paper ${paper ? `${paper.pageCount}p` : 'none'}, pdf ${attach ? 'attached' : 'cached'}, $${res.costUsd.toFixed(4)})`);
+    // Compaction summarises the message that carried the PDF away; from then on this session reads the paper with tools.
+    this.state.setSession(docId, res.sessionId, { sha256: paper?.sha256 ?? null, pdfInContext: plan.mode === 'pdf' && !compacted });
+    console.log(`[ask ${askId.slice(0, 8)}] answered ${chars} chars in ${Date.now() - t0} ms (paper ${paper ? `${paper.pageCount}p` : 'none'}, mode ${plan.mode}${plan.attach ? ', pdf attached' : ''}${plan.sessionId !== sessionId ? ', new session' : ''}, $${res.costUsd.toFixed(4)})`);
     send({ type: 'answer_done', askId, sessionId: res.sessionId, usage: res.usage, costUsd: res.costUsd });
   }
 }

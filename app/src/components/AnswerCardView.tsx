@@ -5,6 +5,7 @@ import { renderMarkdown } from '../agent/markdown';
 import { connectorEndpoints } from '../agent/placement';
 import { cancelAsk, reAsk, retryAsk, summariseHandwriting } from '../agent/ask';
 import { PageOverlayObject } from './TextBoxView';
+import { useAgentStore } from '../agent/client';
 import { IconClose } from './icons';
 
 const HEADER_PT = 18;
@@ -32,6 +33,7 @@ export function AnswerCardView({ tb, zoom, selected, page }: { tb: TextBox; zoom
   const [draft, setDraft] = useState<ScreenDescription | null>(null);
   const drag = useRef<{ pointerId: number; sx: number; sy: number; ox: number; oy: number; orig: TextBox } | null>(null);
   const html = useRenderedHtml(tb.text);
+  const flash = useAgentStore((s) => s.flashCardId === tb.id);
   const summary = useMemo(() => summariseHandwriting(a.description), [a.description]);
 
   // Grow with the content up to maxHeight; beyond that the body scrolls (§6.3 "Growth").
@@ -82,7 +84,7 @@ export function AnswerCardView({ tb, zoom, selected, page }: { tb: TextBox; zoom
     return (
       <>
         {showConnector && <Connector from={conn.from} to={conn.to} zoom={zoom} />}
-        <PageOverlayObject x={tb.x} y={tb.y} width={28 / zoom} height={28 / zoom} zoom={zoom} dataId={tb.id} className="answer-card collapsed">
+        <PageOverlayObject x={tb.x} y={tb.y} width={28 / zoom} height={28 / zoom} zoom={zoom} dataId={tb.id} className={'answer-card collapsed' + (flash ? ' flash' : '')}>
           <button className="btn answer-pill" aria-label="Expand answer" title={summary} onPointerDown={(e) => e.stopPropagation()} onClick={() => setCollapsed(false)}>✦</button>
         </PageOverlayObject>
       </>
@@ -95,7 +97,7 @@ export function AnswerCardView({ tb, zoom, selected, page }: { tb: TextBox; zoom
       {showConnector && <Connector from={conn.from} to={conn.to} zoom={zoom} />}
       <PageOverlayObject
         x={tb.x} y={tb.y} width={tb.width} height={tb.height} zoom={zoom} dataId={tb.id}
-        className={'answer-card' + (a.floating ? ' floating' : '') + (selected ? ' selected' : '') + (a.status === 'answering' ? ' answering' : '')}
+        className={'answer-card' + (a.floating ? ' floating' : '') + (selected ? ' selected' : '') + (a.status === 'answering' ? ' answering' : '') + (flash ? ' flash' : '')}
         style={{ fontSize: tb.fontSize * zoom }}
       >
         <div className="answer-header" style={{ height: HEADER_PT * zoom }} onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}>
@@ -121,7 +123,6 @@ export function AnswerCardView({ tb, zoom, selected, page }: { tb: TextBox; zoom
               <div className="row">
                 <button className="btn primary" style={{ minHeight: 32 }} onClick={() => { setDetails(false); void reAsk(tb.id, draft ?? a.description); setDraft(null); }}>Re-ask</button>
                 <button className="btn" style={{ minHeight: 32 }} onClick={() => { setDetails(false); setDraft(null); }}>Close</button>
-                {a.costUsd != null && <span className="hint">${a.costUsd.toFixed(3)} so far</span>}
               </div>
             </div>
           )}

@@ -4,8 +4,51 @@
     {
       "name": "pdf-notebook",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "app", "run", "dev", "--", "--port", "5173", "--strictPort"],
+      "runtimeArgs": [
+        "--prefix",
+        "app",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5173",
+        "--strictPort"
+      ],
       "port": 5173
+    },
+    {
+      "name": "pdf-notebook-alt",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "app",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5180",
+        "--strictPort"
+      ],
+      "port": 5180
+    },
+    {
+      "name": "agent-mock",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--prefix",
+        "app",
+        "tsx",
+        "app/server/index.ts",
+        "--mock",
+        "--port",
+        "8795",
+        "--data",
+        "app/.e2e-agent-data"
+      ],
+      "port": 8795,
+      "env": {
+        "AGENT_SERVER_TOKEN": "preview-token"
+      }
     }
   ]
 }
