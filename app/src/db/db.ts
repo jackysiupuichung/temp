@@ -16,21 +16,33 @@ export function getDB(): Promise<IDBPDatabase<NotebookDB>> {
   if (!dbPromise) {
     dbPromise = openDB<NotebookDB>('pdf-notebook', 1, {
       upgrade(db) {
-        const docs = db.createObjectStore('documents', { keyPath: 'id' });
-        docs.createIndex('byUpdated', 'updatedAt');
-        db.createObjectStore('blobs', { keyPath: 'id' });
-        db.createObjectStore('thumbnails', { keyPath: 'docId' });
-        const strokes = db.createObjectStore('strokes', { keyPath: 'id' });
-        strokes.createIndex('byDoc', 'docId');
-        strokes.createIndex('byPage', 'pageId');
-        const tbs = db.createObjectStore('textBoxes', { keyPath: 'id' });
-        tbs.createIndex('byDoc', 'docId');
-        tbs.createIndex('byPage', 'pageId');
-        db.createObjectStore('settings', { keyPath: 'key' });
+        createStores(db);
       },
+    }).catch((e: unknown) => {
+      // A newer build may have upgraded this database (extra stores only); open it at its current version
+      // rather than failing every read and leaving the library on "Loading…" forever.
+      if ((e as DOMException)?.name !== 'VersionError') {
+        dbPromise = null;
+        throw e;
+      }
+      return openDB<NotebookDB>('pdf-notebook');
     });
   }
   return dbPromise;
+}
+
+function createStores(db: IDBPDatabase<NotebookDB>) {
+  const docs = db.createObjectStore('documents', { keyPath: 'id' });
+  docs.createIndex('byUpdated', 'updatedAt');
+  db.createObjectStore('blobs', { keyPath: 'id' });
+  db.createObjectStore('thumbnails', { keyPath: 'docId' });
+  const strokes = db.createObjectStore('strokes', { keyPath: 'id' });
+  strokes.createIndex('byDoc', 'docId');
+  strokes.createIndex('byPage', 'pageId');
+  const tbs = db.createObjectStore('textBoxes', { keyPath: 'id' });
+  tbs.createIndex('byDoc', 'docId');
+  tbs.createIndex('byPage', 'pageId');
+  db.createObjectStore('settings', { keyPath: 'key' });
 }
 
 export async function listDocuments(): Promise<DocumentRecord[]> {
